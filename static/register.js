@@ -32,6 +32,7 @@ window.onload = function checkSigninStatus() {
 
 
 
+
 initMultiStepForm();
 
 function initMultiStepForm() {
@@ -155,6 +156,13 @@ function registerUser(event) {
       });
   }
 
+//   function isValidEmail(email) {
+//     // Simple regex for basic email validation
+//     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     return re.test(email);
+// }  
+
+
 
 const submitBtn = document.querySelector(".submit");
 
@@ -171,6 +179,10 @@ if (!email || !password || !username || !gender || !height || !grade) {
     return;
   }
 
+//   if (!isValidEmail(email)) {
+//     alert("Please enter a valid email address.");
+//     return;
+// }  
 const userUrl = "/api/user";
 fetch(userUrl, {
   method: "POST",
@@ -191,6 +203,7 @@ fetch(userUrl, {
   .then((data) => {
     if (data.ok) {
       alert("Register Succesfully. Please Sign in.")
+      window.location.href ="/signin"
     } else {
       alert(`${data.message}`)
     }
@@ -199,10 +212,4 @@ fetch(userUrl, {
     console.error("Error:", err); 
   });
 
-// console.log("Email:", email);
-// console.log("Password:", password);
-// console.log("Username:", username);
-// console.log("Gender:", gender);
-// console.log("Height:", height);
-// console.log("Grade:", grade);
 })
