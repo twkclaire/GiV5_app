@@ -27,13 +27,13 @@ async def member(request: Request):
 	return FileResponse("./templates/member.html", media_type="text/html")
 
 
-# @app.get("/register", include_in_schema=False)
-# async def video(request: Request):
-# 	return FileResponse("./static/register.html", media_type="text/html")
+@app.get("/register", include_in_schema=False)
+async def video(request: Request):
+	return FileResponse("./templates/register.html", media_type="text/html")
 
-# @app.get("/signin", include_in_schema=False)
-# async def video(request: Request):
-# 	return FileResponse("./static/signin.html", media_type="text/html")
+@app.get("/signin", include_in_schema=False)
+async def video(request: Request):
+	return FileResponse("./templates/signin.html", media_type="text/html")
 
 
 # @app.get("/test", include_in_schema=False)

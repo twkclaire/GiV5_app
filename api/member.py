@@ -108,7 +108,7 @@ async def login(user:UserLogIn):
 			val=(user.email,)
 			mycursor.execute(sql, val)
 			existing_user = mycursor.fetchone()
-			print("hello this is exiating_user", existing_user)
+			# print("hello this is exiating_user", existing_user)
 			if existing_user:
 					hash_password=existing_user[2]
 					print("and this is dat hash_password u want",hash_password, "and da user passwerd", user.password)
