@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/member.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>Document</title>
+</head>
+<body>
+    <div class="personal-info-wrap">
+        <!-- <div class="personal-image-wrap">
+            <div class="personal-image">D</div>
+        </div>
+        <div class="personal-info">
+            <div class="personal-name"><h2>Danger Zhang</h2></div>
+            <div class="personal-data">
+                <p>176 cm</p>
+                <p>V7</p>
+                <p>Male</p>
+            </div>
+            <div class="personal-number">
+                <p>Flash 100</p>
+                <p>Done 200</p>
+            </div>
+        </div> -->
+
+    </div>
+
+    <div class="save-title"><h2>Saved Route</h2></div>
+    <div>
+        <div class="todo-card-wrap">
+            <!-- <h2 class="saved-route">Saved Route</h2> -->
+            <!-- route card -->
+
+            <!-- <div class="card-wrap">
+                <div class="card-grade"><div>V5</div></div>
+                <div class="card-name">
+                    <p>1 The Easy Route </p>
+                    <div class="card-detail">
+                        <p>4 days left</p>
+                    </div>  
+                </div>
+                 <div class="card-btn-wrap">
+                    <button>Flash</button>
+                    <button>Done</button>
+                    <button><img src="/static/images/cross.svg"></button>
+                </div>  
+            </div> -->
+
+
+        </div>
+    </div>
+    <div class="record-title"><h2>My Record</h2></div>
+
+    <div class="wrapper">
+        <canvas id="myChart4" height="300"></canvas>
+    </div>
+    <script src="/static/member.js"></script>
+    <script>
+        var ctx = document.getElementById("myChart4").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+                datasets: [    {
+                    label: 'V1',
+                    backgroundColor: "#0033C7",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
+                },
+                {
+                    label: 'V2',
+                    backgroundColor: "#1D4EDA",
+                    data: [12, 20, 15, 15, 5, 5, 6, 8, 13, 10, 11, 10],
+                },
+                {
+                    label: 'V3',
+                    backgroundColor: "#3968EC",
+                    data: [20, 30, 35, 20, 23, 24, 10, 17, 10, 8, 11, 5],
+                },
+                {
+                    label: 'V4',
+                    backgroundColor: "#5573FF",
+                    data: [12, 25, 25, 26, 28, 12, 19, 12, 14, 10, 11, 12],
+                },
+                {
+                    label: 'V5',
+                    backgroundColor: "#7859FF",
+                    data: [2, 5, 5, 6, 8, 2, 5, 6, 1, 0 , 0, 1],
+                },
+                {
+                    label: 'V6',
+                    backgroundColor: "#9C3FFF",
+                    data: [1, 0, 1, 0, 1, 2, 0, 1, 1, 0 , 0, 0],
+                },
+                {
+                    label: 'V7',
+                    backgroundColor: "#BF25FF",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
+                },
+                {
+                    label: 'V8',
+                    backgroundColor: "#E30BFF",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
+                },
+                {
+                    label: 'V9',
+                    backgroundColor: "#F54CFF",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
+                }
+            ],
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        displayColors: true,
+                        callbacks: {
+                            mode: 'x',
+                        },
+                    },
+                    legend: {
+                        position: 'bottom',
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: {
+                            display: false,
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        type: 'linear',
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    </script>
+</body>
+</html>

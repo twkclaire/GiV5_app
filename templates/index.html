@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/index.css" />
+    <title>Home</title>
+
+</head>
+<body>
+
+
+    <div class="nav-bar">
+        <div class="nav-logo-wrap">
+          <a href="/">  
+            <img clas="nav-logo" src="/static/images/logo-black-white.svg" height="60px">
+          </a>
+        </div>
+        <div class="nav-dropdown-wrap">
+            <div class="dropdown">
+                <button class="dropbtn"><img src="/static/images/User.svg"></button>
+                <div class="dropdown-content">
+                  <a href="#">My Page</a>
+                  <a href="#">Log out</a>
+                </div>
+              </div>
+        </div>        
+    </div>        
+
+    <div class="chart-wrap">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <div class="search-wrap">
+        <input type="search" class="route-search" placeholder="Search...">
+        <button type="submit" class="route-submit-btn"> 
+            <img src="/static/images/search.svg" /> 
+        </button>
+    </div>    
+    <div class="cards-wrap">
+        <!-- <div class="card-wrap">
+            <div class="card-grade"><div>V5</div></div>
+            <div class="card-name">
+                <p>1 The Easy Route</p>
+                <div class="card-detail">
+                    <p>4 days ago</p>
+                    <p><img src="/static/images/tick.svg">20</p>
+                </div>
+
+            </div>
+        </div> -->
+
+    </div>    
+
+    <div class="footer"></div>
+       
+
+</body>
+
+
+<script src="/static/index.js"> 
+
+</script>
+</html>

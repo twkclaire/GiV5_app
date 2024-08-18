@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route</title>
+    <link rel="stylesheet" href="/static/route.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/3.0.0/shaka-player.compiled.js"></script>
+</head>
+<body>
+  <div class="route-card-wrap">
+    <!-- fetch card info -->
+  </div> 
+  
+  <div class="button-wrap">
+    <div><button id="route-save-btn">Save</button></div>
+    <div><button id="route-flash-btn">Flash</button></div>
+    <div><button id="route-done-btn">Done</button></div> 
+  </div>
+
+  <div class="video-card-wrap">
+    <div class="beta-wrap">
+        <h3>Beta Video</h3>
+        <button id="uploadButton">Add a Video</button>
+        <input type="file" id="videoInput" accept="video/*" style="display:none;" />
+    </div>  
+
+    <div class="video-wrap">
+      <video id="video" controls></video>
+    </div>
+
+    <div id="spinner" style="display: none;">
+      <!-- You can use a CSS spinner or an image -->
+      <div class="spinner"></div>
+    </div>
+
+    <div class="video-image-wrap">
+      <img class="no-video-image" src="/static/images/noVideo.jpeg">
+    </div>
+
+    <!-- <div class="video-wrap">
+      <video class="route-video" id="videoPlayer" controls>
+        <source src="https://d2jdt95w56fzkq.cloudfront.net/cat.MOV" type="video/mp4" />
+      </video>
+    </div> -->
+
+  </div>    
+
+
+    <div class="done-list-wrap" id="done-list-wrap">
+
+      <h3>Who has done it: </h3>
+      <!-- <div class="user-card-wrap">
+        <div class="user-card-grade">
+          <div class="user-image">C</div>
+        </div>
+        <div class="user-card-name">
+            <div class="user-card-info">
+              <p class="user-name">Claire Kao</p> 
+              <p class="user-grade">V5</p>
+            </div>
+            <div class="user-personal-data">
+              <p class="user-height">158 cm</p>
+              <p class="user gender">Female</p>
+            </div>
+            <div class="user-card-detail">
+                <p class="user-date">10 days ago</p>
+            </div>
+        </div>
+      </div>
+    </div> -->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/route.js"></script>  
+
+    <script>    
+
+
+    </script>
+
+</body>
+</html>
