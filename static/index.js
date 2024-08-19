@@ -97,7 +97,20 @@ getRoute().then(() => {
 
 
 
+// function countDate(){
+//     const expiredDate = new Date("2024-09-10"); // Example date
+//     const today = new Date();
+//     const timeDiff = expiredDate - today;
+//     const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+//     console.log(daysLeft)
+// }
+
 function createRouteCard(data) {
+    const expiredDate = new Date(`${data.expired}`); // Example date
+    const today = new Date();
+    const timeDiff = expiredDate - today;
+    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
     const routeCardLink = document.createElement('a');
     routeCardLink.className = 'route-card-link';
     routeCardLink.href = `/route/${data.routeID}`;
@@ -115,7 +128,7 @@ function createRouteCard(data) {
 
     const cardDetail = document.createElement('div');
     cardDetail.className = 'card-detail';
-    cardDetail.innerHTML = `<p>${data.expired}</p><p><img src="/static/images/tick.svg">20</p>`;
+    cardDetail.innerHTML = `<p><img src=/static/images/trash.svg>  ${daysLeft} days left </p><p><img src="/static/images/tick.svg">  ${data.done} people have done it</p>`;
 
     cardName.appendChild(cardDetail);
     cardWrap.appendChild(cardGrade);
@@ -150,16 +163,21 @@ function renderChart(routeData){
         data: {
             labels: labels,
             datasets: [{
-                label: '',
+                label: 'Route',
                 data: values,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(90, 90, 90, 1)',
+                borderColor: 'rgba(193,28,132, 1)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRation:false,
+            plugins: {
+                legend: {
+                    display: false // Hides the legend
+                }
+            },    
             scales: {
                 y: {
                     beginAtZero: true

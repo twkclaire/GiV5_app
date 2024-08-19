@@ -59,6 +59,43 @@
     </div>
     <script src="/static/member.js"></script>
     <script>
+
+var userId=""
+window.onload = function checkSigninStatus() {
+    const token = localStorage.getItem("token");
+    let content="";
+    const dropdownContent=document.querySelector(".dropdown-content");
+  
+    if (token) {
+      fetch("/api/user/auth", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((resp) => {
+          if (!resp.ok) {
+            return resp.json().then((data) => {
+              throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
+            });
+          }
+          return resp.json();
+        })
+        .then((data) => {
+          console.log("Fetch successful:", data);
+          // Dispatch the userSignedIn event only if the user is successfully authenticated
+          document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
+          userId=data.id
+        })
+        .catch((err) => {
+          console.error("Error:", err.message);
+        });
+    } else {
+      console.error("Token not found");
+
+    }
+  };
+
+    </script>
+    <!-- <script>
         var ctx = document.getElementById("myChart4").getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'bar',
@@ -140,6 +177,6 @@
                 maintainAspectRatio: false,
             }
         });
-    </script>
+    </script> -->
 </body>
 </html>

@@ -20,14 +20,51 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
 
         if keyword is None:
 
-            sql ="SELECT * FROM route LIMIT 9 OFFSET %s"
+            # sql ="SELECT * FROM route LIMIT 9 OFFSET %s"
+            sql="""
+            SELECT 
+                r.routeId,
+                r.name,
+                r.date,
+                r.expired,
+                r.grade,
+                r.available,
+                COALESCE(COUNT(CASE WHEN a.type = 1 THEN 1 END), 0) AS type_1_count
+            FROM 
+                route r
+            LEFT JOIN 
+                achievement a ON r.routeId = a.routeId
+            GROUP BY 
+                r.routeId
+            LIMIT 9 OFFSET %s;
+
+            """
             mycursor.execute(sql,(start,))
             results=mycursor.fetchall()
             num_results=len(results)
             print(results)
 
         else: 
-            sql ="SELECT * FROM route WHERE name LIKE %s OR routeId =%s LIMIT 9 OFFSET %s" 
+            # sql ="SELECT * FROM route WHERE name LIKE %s OR routeId =%s LIMIT 9 OFFSET %s" 
+            sql="""
+            SELECT 
+                r.routeId,
+                r.name,
+                r.date,
+                r.expired,
+                r.grade,
+                r.available,
+                COALESCE(COUNT(CASE WHEN a.type = 1 THEN 1 END), 0) AS type_1_count
+            FROM 
+                route r
+            LEFT JOIN 
+                achievement a ON r.routeId = a.routeId
+            WHERE 
+                r.name LIKE %s OR r.routeId = %s
+            GROUP BY 
+                r.routeId
+            LIMIT 9 OFFSET %s;
+            """
             sql_data=["%"+keyword+"%",keyword,start]
             mycursor.execute(sql,sql_data)
             results=mycursor.fetchall()
@@ -41,7 +78,8 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
                 "date":result[2],
                 "expired":result[3],
                 "grade":result[4],
-                "available":result[5]
+                "available":result[5],
+                "done":result[6]
             }
             allRoutes.append(data)
         
@@ -104,7 +142,27 @@ async def getRoutes(routeID:int):
     try:
         db =cnxpool.get_connection()
         mycursor = db.cursor()
-        sql ="SELECT * FROM route where routeId=%s"
+        # sql ="SELECT * FROM route where routeId=%s"
+        sql="""
+        SELECT
+            r.routeId,
+            r.name,
+            r.date,
+            r.expired,
+            r.grade,
+            r.available,
+            COUNT(CASE WHEN a.type = 0 THEN 1 END) AS count_type_0,
+            COUNT(CASE WHEN a.type = 1 THEN 1 END) AS count_type_1
+        FROM
+            route r
+        LEFT JOIN
+            achievement a ON r.routeId = a.routeId
+        WHERE
+            r.routeId = %s
+        GROUP BY
+            r.routeId, r.name, r.date, r.expired, r.grade, r.available;
+
+        """
         val=(routeID,)
         mycursor.execute(sql,val)
         route=mycursor.fetchone()
@@ -115,7 +173,9 @@ async def getRoutes(routeID:int):
                 "date":route[2],
                 "expired":route[3],
                 "grade":route[4],
-                "available":route[5]
+                "available":route[5],
+                "flash":route[6],
+                "done":route[7],
             }
         return data
             

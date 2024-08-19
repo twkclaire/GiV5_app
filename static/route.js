@@ -5,6 +5,44 @@ console.log("check this out my video url:", videourl)
 
 const routeCardWrap = document.querySelector(".route-card-wrap");
 const videoWrap = document.querySelector(".video-wrap");  
+var userId="";
+
+
+window.onload = function checkSigninStatus() {
+    const token = localStorage.getItem("token");
+  
+    if (token) {
+      fetch("/api/user/auth", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((resp) => {
+          if (!resp.ok) {
+            return resp.json().then((data) => {
+              throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
+            });
+          }
+          return resp.json();
+        })
+        .then((data) => {
+          console.log("Fetch successful:", data);
+          userId=data.data.id;
+          console.log("This is your id:",userId);
+          // Dispatch the userSignedIn event only if the user is successfully authenticated
+          document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
+
+        })
+        .catch((err) => {
+          console.error("Error:", err.message);
+        });
+    } else {
+      console.error("Token not found");
+    }
+  };
+
+
+
+//getting route data
 function getData(){
 
   const url ="/api/route/"+routeId
@@ -27,7 +65,11 @@ function getData(){
       let grade=data.grade;
       let routeID=data.routeID;
       let name=data.name;
-      let deadline=data.expired;
+    //   let deadline=data.expired;
+      const expiredDate = new Date(`${data.expired}`); // Example date
+      const today = new Date();
+      const timeDiff = expiredDate - today;
+      const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
       
       main +=`
           <div class="route-card-grade" id="route_grade">${grade}</div>
@@ -36,9 +78,9 @@ function getData(){
                 <p id="route_name">${routeID} ${name}</p>
               </div>
               <div class="route-card-detail">
-                <p id="route_sent">22 Sent</p>
-                <p id="route_done">40 Done</p>
-                <p id="route_delete">${deadline}</p>
+                <p id="route_sent">${data.flash} Flash</p>
+                <p id="route_done">${data.done} Done</p>
+                <p id="route_delete"><img src="/static/images/trash.svg">  ${daysLeft} days left</p>
               </div>
             </div> 
       `
@@ -51,7 +93,8 @@ function getData(){
 
 
 
-// video
+// fetching video
+
 function getVideo(){
   fetch(videourl)
   .then(response => response.json())
@@ -84,19 +127,19 @@ function getVideo(){
 
 
 
-
+// initialising player
 async function initApp(url) {
-// Install built-in polyfills to patch browser compatibility issues.
-shaka.polyfill.installAll();
+    // Install built-in polyfills to patch browser compatibility issues.
+    shaka.polyfill.installAll();
 
-// Check if the browser supports the features we need.
-if (shaka.Player.isBrowserSupported()) {
-    // Call getVideo to fetch and play the video
-    playVideo(url);
-} else {
-    console.error('Browser not supported!');
-}
-}
+    // Check if the browser supports the features we need.
+    if (shaka.Player.isBrowserSupported()) {
+        // Call getVideo to fetch and play the video
+        playVideo(url);
+    } else {
+        console.error('Browser not supported!');
+    }
+    }
 
 
 
@@ -172,64 +215,91 @@ routeFlashBtn.addEventListener("click", () => handleButtonClick(0));
 
 
 function handleSave() {
-            console.log("Save button clicked");
-            fetch('/api/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    memberId: 1,  // Replace with actual data
-                    routeId: routeId, // Replace with actual data
+            const token = localStorage.getItem("token");
+            if(token){
+                console.log("Save button clicked");
+                fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        memberId: userId,  // Replace with actual data
+                        routeId: routeId, // Replace with actual data
 
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                result=data.ok
-                if (result == true){
-                  console.log("Saved Successfuly!")
-                } else {
-                  console.log("This is saved already!")
-                }
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    result=data.ok
+                    if (result == true){
+                    console.log("Saved Successfuly!")
+                    } else {
+                    console.log("This is saved already!")
+                    }
 
-            })
-            .catch((error) => {
-                console.error('Save Error:', error);
-            });
-        }
+                })
+                .catch((error) => {
+                    console.error('Save Error:', error);
+                });
+            }else{
+                alert("please log in first!")
+            }
+        }   
 
 async function handleButtonClick(type) {
-// Replace these values with your actual memberId and routeId
-console.log("clicke button is flash 0 or done 1:",type)
+    const token = localStorage.getItem("token");
+    console.log("clicke button is flash 0 or done 1:",type)
 
-try {
-    const response = await fetch('/api/done', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            memberId: 1,
-            routeId: routeId,
-            type: type,
-        }),
-    });
+        if (token){
+            try {
+                const response = await fetch('/api/done', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        memberId: userId,
+                        routeId: routeId,
+                        type: type,
+                    }),
+                });
 
-    const data = await response.json();
+                const data = await response.json();
 
-    if (response.ok) {
-        console.log(data);
-    } else {
-        console.error('Request failed:', data);
-    }
-} catch (error) {
-    console.error('Fetch error:', error);
+                if (response.ok) {
+                    if (data.ok){
+                        console.log("Record created succesfully")
+                    }else{
+                        console.log("Record already exists!")
+                    }
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }else{
+            alert("please log in first!")
+        }        
+    }    
+
+
+// Function to calculate days ago
+function daysAgo(dateString) {
+    const inputDate = new Date(dateString);
+    const currentDate = new Date();
+    const timeDifference = currentDate - inputDate;
+    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    
+    return daysDifference;
 }
-}        
 
+// Example usage
+const dateString = "2024-08-17T08:51:21";
+const daysAgoCount = daysAgo(dateString);
 
+console.log(`The date was ${daysAgoCount} days ago.`);
 
+// Done list that shows people who has finished the route
 
 document.addEventListener('DOMContentLoaded', () => {
     const doneListWrap = document.getElementById('done-list-wrap');
@@ -254,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="user gender">${user.gender}</p>
                 </div>
                 <div class="user-card-detail">
-                    <p class="user-date">${user.date}</p>
+                    <p class="user-date">${daysAgo(user.date)} days ago</p>
                 </div>
             </div>
         `;
