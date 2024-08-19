@@ -141,6 +141,10 @@ video {
     margin:60px auto;
 
 }  
+
+.done-list-title{
+  margin-bottom: 20px;
+}
 .user-card-wrap{
     background-color: transparent;
     border: 1px solid;

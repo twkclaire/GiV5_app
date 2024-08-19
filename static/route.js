@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayData(data) {
-        doneListWrap.innerHTML = '<h3>Who has done it: </h3>';
+        doneListWrap.innerHTML = '<h3 class="done-list-title">Who has done it: </h3>';
 
             data.forEach(user => {
                 const userCard = createUserCard(user);
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (data.length === 0) {
-                doneListWrap.innerHTML += '<p>No users found.</p>';
+                doneListWrap.innerHTML += '<p>Be the first one to climb this route!</p>';
             }
 
     }
