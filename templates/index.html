@@ -82,7 +82,6 @@ window.onload = function checkSigninStatus() {
         })
         .then((data) => {
           console.log("Fetch successful:", data);
-          // Dispatch the userSignedIn event only if the user is successfully authenticated
           document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
           userId=data.data.id
           console.log("is this the user id:",userId)
