@@ -2,7 +2,6 @@ from fastapi import *
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from database import cnxpool
-from enum import Enum
 from typing import Optional
 from datetime import date
 from mysql.connector import Error
@@ -16,9 +15,6 @@ class RouteSave(BaseModel):
 	memberId:int
 	routeId:int
 
-# class TypeEnum (str, Enum):
-# 	flash ='flash'
-# 	done ='done'
 
 class DoneRoute(BaseModel):
 	memberId:int
@@ -27,7 +23,7 @@ class DoneRoute(BaseModel):
 	completed_date:Optional[date]=None
 
 @router.post("/api/save", tags=["Record"])
-async def saveRoute(route:RouteSave):
+async def savedRoute(route:RouteSave):
 	try: 
 		db =cnxpool.get_connection()
 		mycursor = db.cursor()
@@ -56,6 +52,41 @@ async def saveRoute(route:RouteSave):
 		mycursor.close()
 		db.close()
 
+
+class DeleteRoute(BaseModel):
+	memberId:int
+	routeId:int
+
+
+
+
+@router.put("/api/save", tags=["Record"])
+async def deleteSavedRoute(route: DeleteRoute):
+    try:
+        db = cnxpool.get_connection()
+        mycursor = db.cursor()
+        
+        sql_check = """
+        DELETE FROM savedRoute WHERE memberId=%s AND routeId=%s;
+        """
+        val_check = (route.memberId, route.routeId)
+        mycursor.execute(sql_check, val_check)
+        db.commit()
+        
+        #check if delete succesfully 
+        if mycursor.rowcount == 0:
+            return JSONResponse(status_code=404, content={"error": True, "message": "Record not found"})
+
+        return {"ok": True}
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return JSONResponse(status_code=500, content={"error": True, "message": "Internal server error", "details": str(e)})
+    finally:
+        if mycursor:
+            mycursor.close()
+        if db:
+            db.close()
 
 
 
