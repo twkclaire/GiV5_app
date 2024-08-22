@@ -109,7 +109,7 @@ body {
 }
 
 
-/* styleing to do list buttons */
+/* styling to-do list buttons */
 .card-btn-wrap {
     display: flex;
     gap: 15px;
@@ -134,6 +134,8 @@ body {
 }
 
 
+
+
  /* delete button*/
 .card-btn-wrap button:last-child {
     background-color: transparent; 
@@ -153,3 +155,39 @@ body {
     filter: invert(0); 
 }
 
+
+
+
+/* The Charts */
+.wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+.chart-wrap {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+}
+
+.month-chart-wrap, .three-month-chart-wrap {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}

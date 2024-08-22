@@ -158,9 +158,9 @@ async def getMember(memberId:int):
 				m.username,
 				m.gender,
 				m.height,
-				m.grade,
-				SUM(a.type) AS flash_count,  
-				COUNT(a.routeId) - SUM(a.type) AS done_count 
+				m.grade,  
+				COUNT(a.routeId) - SUM(a.type) AS flash_count,
+                SUM(a.type) AS done_count         
 			FROM
 				member m
 			LEFT JOIN achievement a ON m.memberId = a.memberId
@@ -247,3 +247,79 @@ async def getMemberRoute(memberId:int):
         if db.is_connected():
             mycursor.close()
             db.close()    
+
+
+@router.get("/api/data/{memberId}")
+async def get_member_data(memberId: int):
+    try:
+        db = cnxpool.get_connection()
+        mycursor = db.cursor(dictionary=True)
+
+        # Monthly achievements query
+        monthly_sql = """
+		SELECT
+			SUM(CASE WHEN type = 0 THEN 1 ELSE 0 END) AS type_0_count,
+			SUM(CASE WHEN type = 1 THEN 1 ELSE 0 END) AS type_1_count
+		FROM achievement
+		WHERE memberId = %s
+		AND type IN (0, 1)
+		AND date >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
+		AND date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY);
+        """
+        mycursor.execute(monthly_sql, (memberId,))
+        monthly_result = mycursor.fetchone()
+
+        # All-time achievements by grade query
+        all_time_sql = """
+        SELECT
+            r.grade,
+            SUM(CASE WHEN a.type = 0 THEN 1 ELSE 0 END) AS type_0_count,
+            SUM(CASE WHEN a.type = 1 THEN 1 ELSE 0 END) AS type_1_count
+        FROM achievement a
+        JOIN route r ON a.routeId = r.routeId
+        WHERE a.memberId = %s
+        GROUP BY r.grade;
+        """
+        mycursor.execute(all_time_sql, (memberId,))
+        all_time_results = mycursor.fetchall()
+
+        # monthly results
+        monthly_data = {
+            "flash": monthly_result["type_0_count"] if monthly_result else 0,
+            "done": monthly_result["type_1_count"] if monthly_result else 0
+        }
+
+        # all-time results
+        all_time_data = {}
+        for row in all_time_results:
+            grade = row["grade"]
+            all_time_data[grade] = {
+                "flash": row["type_0_count"],
+                "done": row["type_1_count"]
+            }
+
+        # Ensure all expected grades are included
+        expected_grades = [f"V{i}" for i in range(1, 10)]  # Adjust based on your actual grade range
+        for grade in expected_grades:
+            if grade not in all_time_data:
+                all_time_data[grade] = {"flash": 0, "done": 0}
+
+        return {
+            "data": {
+                "monthly_achievement": monthly_data,
+                "all_time_achievement": all_time_data
+            }
+        }
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": True,
+                "message": f"Internal Server Error: {str(e)}"
+            }
+        )
+    finally:
+        if db.is_connected():
+            mycursor.close()
+            db.close()
