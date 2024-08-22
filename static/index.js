@@ -22,8 +22,6 @@ routeSubmitBtn.addEventListener("click",() => {
 });
 
 
-//get route cards 
-
 async function getRoute() {
     isFetching =true;
     if (page == null) { //stop loading if nextPage is null

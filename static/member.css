@@ -3,6 +3,7 @@
     --background-color: #f8f8f8;
     --container-bg: #fff; 
     --text-color: #333;
+    --inputBorderColor: lightgray; 
     --border-radius: 8px; 
     --shadow: 0 4px 8px rgba(0,0,0,0.1); 
     --font-primary: "Poppins", sans-serif;
@@ -22,6 +23,87 @@ body {
     color: var(--text-color); 
     background-color: var(--background-color); /
 }
+
+
+/* nav bar */
+.nav-bar {
+    background-color: var(--container-bg);
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--inputBorderColor);
+}
+
+.nav-logo-wrap {
+    align-items: center;
+}
+
+.nav-logo {
+    height: 45px;
+    margin-left:20px;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: var(--primary); 
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    font-weight: 500; 
+    display: inline-flex; 
+    align-items: center; /* center vertically */
+    justify-content: center; /* Center horizontally */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+
+.dropbtn:hover {
+    background-color: #f1f1f1; 
+    transform: scale(1.1); /* Scale up the button slightly */
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+    border-radius: 5px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: var(--primary); 
+    padding: 12px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px; 
+}
+
+/* Dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .dropbtn {
+    background-color: #f1f1f1;
+    color: white;
+}
+
 
 .personal-info-wrap {
     display: flex;

@@ -9,12 +9,11 @@
     --primary: #333; 
     --secondary: #333; 
     --inputBorderColor: lightgray; 
-    --bgColor: #f8f8f8;
     --containerWidth: 800px; 
 }
 /* nav bar */
 .nav-bar {
-    background-color: var(--bgColor); 
+    /* background-color: var(--bgColor);  */
     height: 64px;
     display: flex;
     justify-content: space-between;
@@ -28,6 +27,7 @@
 
 .nav-logo {
     height: 45px;
+    margin-left:20px;
 }
 
 /* Dropdown Button */

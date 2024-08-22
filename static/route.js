@@ -1,44 +1,8 @@
 const path = window.location.pathname;
 const routeId=path.split('/')[2];
 const videourl=`/api/route/${routeId}/video`;
-console.log("check this out my video url:", videourl)  
-
 const routeCardWrap = document.querySelector(".route-card-wrap");
 const videoWrap = document.querySelector(".video-wrap");  
-var userId="";
-
-
-window.onload = function checkSigninStatus() {
-    const token = localStorage.getItem("token");
-  
-    if (token) {
-      fetch("/api/user/auth", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((resp) => {
-          if (!resp.ok) {
-            return resp.json().then((data) => {
-              throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
-            });
-          }
-          return resp.json();
-        })
-        .then((data) => {
-          console.log("Fetch successful:", data);
-          userId=data.data.id;
-          console.log("This is your id:",userId);
-          // Dispatch the userSignedIn event only if the user is successfully authenticated
-          document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
-
-        })
-        .catch((err) => {
-          console.error("Error:", err.message);
-        });
-    } else {
-      console.error("Token not found");
-    }
-  };
 
 
 
@@ -102,13 +66,12 @@ function getVideo(){
     console.log("am I successful fetching video??",data)
       if (data.videos.length === 0) {
           // Display "add a video" image or message
-          console.log("no video yet brother")
           document.querySelector('.video-wrap').classList.remove('show');
           document.querySelector('.video-image-wrap').classList.add('show');
           console.log("Video wrap classes:", document.querySelector('.video-wrap').className);
           console.log("Image wrap classes:", document.querySelector('.video-image-wrap').className);
           console.log("we have no video found")
-          // displayAddVideoMessage();
+
       } else {
           // Display the videos
           document.querySelector('.video-wrap').classList.add('show');
@@ -117,7 +80,6 @@ function getVideo(){
           initApp(Url)
           console.log("we found some videos")
 
-          
       }
   })
   .catch(error => {
@@ -129,80 +91,101 @@ function getVideo(){
 
 // initialising player
 async function initApp(url) {
-    // Install built-in polyfills to patch browser compatibility issues.
-    shaka.polyfill.installAll();
-
-    // Check if the browser supports the features we need.
-    if (shaka.Player.isBrowserSupported()) {
-        // Call getVideo to fetch and play the video
-        playVideo(url);
-    } else {
-        console.error('Browser not supported!');
+        shaka.polyfill.installAll();
+        if (shaka.Player.isBrowserSupported()) {
+            playVideo(url);
+        } else {
+            console.error('Browser not supported!');
+        }
     }
-    }
-
 
 
 async function playVideo(url) {
-const videoElement = document.getElementById('video');
-const player = new shaka.Player(videoElement);
+        const videoElement = document.getElementById('video');
+        const player = new shaka.Player(videoElement);
 
+        try {
+            await player.load(url);
+            console.log('The video has now been loaded and is playing!');
+        } catch (error) {
 
-try {
-    // Load and play the video from the provided URL
-    await player.load(url);
-    console.log('The video has now been loaded and is playing!');
-} catch (error) {
-    // Handle any errors that occur during loading
-    console.log(error);
-}
-}
+            console.log(error);
+        }
+    }
 
 
 
 getData()
 getVideo()
 
-//upload function 
+
+// updated upload function using presigned url and trigger background process
 
 document.getElementById("uploadButton").addEventListener("click", function() {
-document.getElementById("videoInput").click();
+    document.getElementById("videoInput").click();
 });
 
-document.getElementById("videoInput").addEventListener("change", function() {
-const file = this.files[0];
+document.getElementById("videoInput").addEventListener("change", async function() {
+    const file = this.files[0];
 
-if (file) {
+    if (file) {
+        console.log(file.name, file.type, "this is the routeId:", routeId)
+        try {
+            document.getElementById("spinner").style.display = "block";
 
-    document.getElementById("spinner").style.display = "block";
+            // Step 1: Request a presigned URL from the backend
+            const response = await fetch("/api/route/presigned-url", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    file_name: file.name,
+                    content_type: file.type
+                })
+            });
 
-    const formData = new FormData();
-    formData.append("video", file);
-    formData.append("route_id", routeId);
+            const data = await response.json();
+            const presignedUrl = data.presigned_url;
+            const fileKey = data.file_key;
 
-    // Send the file to the server
-    fetch("/api/route", {
-        method: "POST",
-        body: formData
-    }).then(response => response.json())
-    .then(data => {
-        console.log("Upload successful:", data);
-        alert("Video uploaded successfully!");
+            // Step 2: Upload the video file to S3 using the presigned URL
+            await fetch(presignedUrl, {
+                method: "PUT",
+                body: file,
+                headers: {
+                    "Content-Type": file.type
+                }
+            });
 
-        document.getElementById("spinner").style.display = "none";
+            // Step 3: Notify the backend to start processing the video
+            const processResponse = await fetch("/api/route/process-video", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    route_id: routeId,  
+                    file_key: fileKey
+                })
+            });
 
+            const processResult = await processResponse.json();
+            console.log("Video processing initiated:", processResult);
 
-    })
-    .catch(error => {
-        console.error("Upload failed:", error);
-        alert("Video upload failed!");
+            alert("Video uploaded and processing started successfully!");
 
-        document.getElementById("spinner").style.display = "none";
-
-    });
-
-}
+        } catch (error) {
+            console.error("Upload or processing failed:", error);
+            alert("Video upload or processing failed!");
+        } finally {
+            document.getElementById("spinner").style.display = "none";
+        }
+    }
 });
+
+
+
 
 
 const routeSaveBtn = document.getElementById("route-save-btn");
@@ -215,6 +198,7 @@ routeFlashBtn.addEventListener("click", () => handleButtonClick(0));
 
 
 function handleSave() {
+            console.log("savebutton check userId:",userId);
             const token = localStorage.getItem("token");
             if(token){
                 console.log("Save button clicked");
@@ -248,6 +232,7 @@ function handleSave() {
         }   
 
 async function handleButtonClick(type) {
+    console.log("flashdone check userId:",userId)
     const token = localStorage.getItem("token");
     console.log("clicke button is flash 0 or done 1:",type)
 
@@ -293,18 +278,13 @@ function daysAgo(dateString) {
     return daysDifference;
 }
 
-// Example usage
-const dateString = "2024-08-17T08:51:21";
-const daysAgoCount = daysAgo(dateString);
 
-console.log(`The date was ${daysAgoCount} days ago.`);
 
 // Done list that shows people who has finished the route
 
 document.addEventListener('DOMContentLoaded', () => {
     const doneListWrap = document.getElementById('done-list-wrap');
 
-    // const routeId = 1; // Example routeId
 
     function createUserCard(user) {
         const userCardWrap = document.createElement('div');
@@ -351,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doneListWrap.innerHTML = '<p>Sorry, there was an error loading the data.</p>';
     }
 
-    fetch(`/api/done/${routeId}`) // Replace with your API endpoint
+    fetch(`/api/done/${routeId}`) 
         .then(response => response.json())
         .then(responseData => {
             const dataArray = responseData.data || []; // Default to empty array if data is undefined

@@ -1,71 +1,63 @@
+
 const path = window.location.pathname;
-const memberId=path.split('/')[2];
-console.log(memberId)
-const url=`/api/member/${memberId}`;
-const savedUrl=`/api/save/${memberId}`;
-console.log("check this out my video url:", url)  
+const memberId = path.split('/')[2];
+const url = `/api/member/${memberId}`;
+const savedUrl = `/api/save/${memberId}`;
 const personalInfoWrap = document.querySelector(".personal-info-wrap");
-const todoCardWrap= document.querySelector(".todo-card-wrap");
-
-
+const todoCardWrap = document.querySelector(".todo-card-wrap");
 
 function getSavedRoute() {
     fetch(savedUrl)
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(error => {
-                throw new Error(error.message);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Data fetched:", data); 
-        let mainHTML = "";
-        if (data.data.length === 0) {
-            console.log("no saved data");
-            mainHTML = "<div class='no-data'>You don't have anything saved yet!</div>";
-            todoCardWrap.innerHTML = mainHTML;
-            return;
-        }
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(error => {
+                    throw new Error(error.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            let mainHTML = "";
+            if (data.data.length === 0) {
+                mainHTML = "<div class='no-data'>You don't have anything saved yet!</div>";
+                todoCardWrap.innerHTML = mainHTML;
+                return;
+            }
 
-        data.data.forEach(route => {
-            mainHTML += `
-                <div class="card-wrap data-route-id="${route.routeId}" onclick="navigateToRoute(this)">
-                    <a href="/route/${route.routeId}" class="card-link"></a>
-                    <div class="card-grade"><div>${route.routeGrade}</div></div>
-                    <div class="card-name">
-                        <p>${route.routeId}. ${route.routeName}</p>
-                        <div class="card-detail">
-                            <p>${route.expiredDate}</p>
+            data.data.forEach(route => {
+                mainHTML += `
+                    <div class="card-wrap" data-route-id="${route.routeId}" onclick="navigateToRoute(this)">
+                        <a href="/route/${route.routeId}" class="card-link"></a>
+                        <div class="card-grade"><div>${route.routeGrade}</div></div>
+                        <div class="card-name">
+                            <p>${route.routeId}. ${route.routeName}</p>
+                            <div class="card-detail">
+                                <p>${route.expiredDate}</p>
+                            </div>  
+                        </div>
+                        <div class="card-btn-wrap">
+                            <button onclick="handleButtonClick(event, 0, ${route.routeId})">Flash</button>
+                            <button onclick="handleButtonClick(event, 1, ${route.routeId})">Done</button>
+                            <button onclick="deleteRoute(event, '${route.routeId}', this)"><img src="/static/images/cross.svg"></button>
                         </div>  
                     </div>
-                    <div class="card-btn-wrap">
-                        <button onclick="handleButtonClick(event, 0, ${route.routeId})">Flash</button>
-                        <button onclick="handleButtonClick(event, 1, ${route.routeId})">Done</button>
-                        <button onclick="deleteRoute(event, '${route.routeId}', this)"><img src="/static/images/cross.svg"></button>
-                    </div>  
-                </div>
-            `;
-        });
+                `;
+            });
 
-        todoCardWrap.innerHTML += mainHTML;
-    })
-    .catch(error => {
-        console.error('Error fetching saved routes:', error);
-    });
+            todoCardWrap.innerHTML = mainHTML;
+        })
+        .catch(error => {
+            console.error('Error fetching saved routes:', error);
+        });
 }
 
-// make to do card clickable
 function navigateToRoute(element) {
     const routeId = element.getAttribute('data-route-id');
     window.location.href = `/route/${routeId}`;
 }
 
-
-
-function deleteRoute(event,routeId, buttonElement) {
-    event.stopPropagation() //prevent event bubbling
+function deleteRoute(event, routeId, buttonElement) {
+    event.stopPropagation(); // Prevent event bubbling
     const data = {
         memberId: memberId,
         routeId: routeId
@@ -87,9 +79,9 @@ function deleteRoute(event,routeId, buttonElement) {
             });
         }
     })
-    .then(data => {
-        // alert('Record deleted successfully!');
-        buttonElement.closest('.card-wrap').remove(); // Remove the card from the UI
+    .then(() => {
+        // Remove the card from the UI
+        buttonElement.closest('.card-wrap').remove();
     })
     .catch(error => {
         console.error('Error:', error);
@@ -97,12 +89,9 @@ function deleteRoute(event,routeId, buttonElement) {
     });
 }
 
-
-
 async function handleButtonClick(event, type, routeId) {
-    event.stopPropagation() //prevent event bubbling
+    event.stopPropagation(); // Prevent event bubbling
     const token = localStorage.getItem("token");
-    console.log("Clicked button is flash 0 or done 1:", type, "for route ID:", routeId, "member id is:", memberId);
 
     if (token) {
         try {
@@ -123,7 +112,12 @@ async function handleButtonClick(event, type, routeId) {
             if (response.ok) {
                 if (data.ok) {
                     console.log("Record created successfully");
-                    getMemberData();
+
+                    // Update counts after successful record creation
+                    const memberData = await getMemberData();
+                    if (memberData) {
+                        updateCounts(memberData.flash, memberData.done);
+                    }
                 } else {
                     console.log("Record already exists!");
                 }
@@ -137,35 +131,28 @@ async function handleButtonClick(event, type, routeId) {
         alert("Please log in first!");
     }
 }
-  
 
-
-
-// member info
-function getMemberData(){
-    let main =""
-    fetch(url)
-    .then((response) => {
-        if(!response.ok){
-            return response.json().then((error) => {
-                throw new Error(error.message);
-            });
+function getMemberData() {
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(error => {
+                    throw new Error(error.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Prepare the HTML for personal-info-wrap
+            const initial = data.username[0];
+            const username = data.username;
+            const height = data.height;
+            const gender = data.gender;
+            const grade = data.grade;
+            const done = data.done;
+            const flash = data.flash;
             
-        }
-        return response.json();
-
-    })
-    .then((data)=>{
-        // console.log(data)
-        let initial=data.username[0];
-        let username=data.username;
-        let height=data.height;
-        let gender=data.gender;
-        let grade=data.grade;
-        let done=data.done;
-        let flash=data.flash;
-        
-        main +=`     
+            const personalInfoHTML = `
                 <div class="personal-image-wrap">
                     <div class="personal-image">${initial}</div>
                 </div>
@@ -181,25 +168,28 @@ function getMemberData(){
                         <p>Done: ${done}</p>
                     </div>
                 </div>
-        `
+            `;
   
-        personalInfoWrap.innerHTML += main; 
-        
-      })
-    .catch(error => {
-        console.error('Error fetching videos:', error);
-    });  
-  
-  } 
+            personalInfoWrap.innerHTML = personalInfoHTML;
+        })
+        .catch(error => {
+            console.error('Error fetching member data:', error);
+        });
+}
 
-//   getMemberData(); 
+function updateCounts(flash, done) {
+    const flashElement = document.querySelector('.personal-number p:first-of-type');
+    const doneElement = document.querySelector('.personal-number p:nth-of-type(2)');
+    if (flashElement && doneElement) {
+        flashElement.textContent = `Flash: ${flash}`;
+        doneElement.textContent = `Done: ${done}`;
+    }
+}
 
-  document.addEventListener('DOMContentLoaded', function() {
-    getMemberData();  
-    getSavedRoute();
+document.addEventListener('DOMContentLoaded', function() {
+    getMemberData(); 
+    getSavedRoute(); 
 });
-
-
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -263,10 +253,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             // All-time achievement chart
-             // Define the expected order
              const expectedOrder = ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9"];
-            
-             // Extract keys from data
+
              const allTimeAchievement = data.data.all_time_achievement;
  
              // Sort the keys based on the expected order
@@ -274,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function () {
              const flashData = labels.map(grade => allTimeAchievement[grade].flash);
              const doneData = labels.map(grade => allTimeAchievement[grade].done);
  
-             // Create the chart
              const ctxThreeMonth = document.getElementById('threeMonthChart').getContext('2d');
              new Chart(ctxThreeMonth, {
                  type: 'bar',
@@ -312,37 +299,3 @@ document.addEventListener('DOMContentLoaded', function () {
          });
  });
 
-
-
-//  var userId=""
-//  window.onload = function checkSigninStatus() {
-//      const token = localStorage.getItem("token");
-//      let content="";
-//      const dropdownContent=document.querySelector(".dropdown-content");
- 
-//      if (token) {
-//      fetch("/api/user/auth", {
-//          method: "GET",
-//          headers: { Authorization: `Bearer ${token}` },
-//      })
-//          .then((resp) => {
-//          if (!resp.ok) {
-//              return resp.json().then((data) => {
-//              throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
-//              });
-//          }
-//          return resp.json();
-//          })
-//          .then((data) => {
-//          console.log("Fetch successful:", data);
-//          document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
-//          userId=data.id
-//          })
-//          .catch((err) => {
-//          console.error("Error:", err.message);
-//          });
-//      } else {
-//      console.error("Token not found");
-
-//      }
-//  };
