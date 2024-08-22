@@ -1,34 +1,34 @@
 
 
-window.onload = function checkSigninStatus() {
-  const token = localStorage.getItem("token");
+// window.onload = function checkSigninStatus() {
+//   const token = localStorage.getItem("token");
 
-  if (token) {
-    fetch("/api/user/auth", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          return resp.json().then((data) => {
-            throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
-          });
-        }
-        return resp.json();
-      })
-      .then((data) => {
-        console.log("Fetch successful:", data);
-        // Dispatch the userSignedIn event only if the user is successfully authenticated
-        document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
-        window.location.href = "/"
-      })
-      .catch((err) => {
-        console.error("Error:", err.message);
-      });
-  } else {
-    console.error("Token not found");
-  }
-};
+//   if (token) {
+//     fetch("/api/user/auth", {
+//       method: "GET",
+//       headers: { Authorization: `Bearer ${token}` },
+//     })
+//       .then((resp) => {
+//         if (!resp.ok) {
+//           return resp.json().then((data) => {
+//             throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
+//           });
+//         }
+//         return resp.json();
+//       })
+//       .then((data) => {
+//         console.log("Fetch successful:", data);
+//         // Dispatch the userSignedIn event only if the user is successfully authenticated
+//         document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
+//         window.location.href = "/"
+//       })
+//       .catch((err) => {
+//         console.error("Error:", err.message);
+//       });
+//   } else {
+//     console.error("Token not found");
+//   }
+// };
 
 
 
@@ -46,6 +46,7 @@ function initMultiStepForm() {
     const nextButtons = document.querySelectorAll(".next");
     const prevButtons = document.querySelectorAll(".prev");
     const stepsNumber = pages.length;
+
 
     if (progressNumber !== stepsNumber) {
         console.warn(
@@ -88,15 +89,12 @@ function initMultiStepForm() {
             current -= 1;
         });
     }
-    submitBtn.addEventListener("click", function () {
+    submitBtn.addEventListener("click", function (event) {
+      event.preventDefault();
         bullet[current - 1].classList.add("active");
         progressCheck[current - 1].classList.add("active");
         progressText[current - 1].classList.add("active");
-        // current += 1;
-        // setTimeout(function () {
-        //     alert("Your Form Successfully Signed up");
-        //     location.reload();
-        // }, 800);
+        registerUser ();
     });
 
     function validateInputs(ths) {
@@ -119,70 +117,27 @@ function initMultiStepForm() {
 
 
 
-//reference how to connect to backend
-
-function registerUser(event) {
-    event.preventDefault(); // Prevent form submission
-  
-    var nameRe = document.getElementById("namere").value;
-    var emailRe = document.getElementById("emailre").value;
-    var passwordRe = document.getElementById("passwordre").value;
-    var resultRe = document.getElementById("resultre");
-    // console.log(nameRe, emailRe, passwordRe);
-
-  
-    const userUrl = "/api/user";
-    fetch(userUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: nameRe,
-        email: emailRe,
-        password: passwordRe,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.ok) {
-          resultRe.innerText = "註冊成功！！";
-        } else {
-          resultRe.innerText = data.message;
-        }
-      })
-      .catch((err) => {
-        console.error("Error:", err); //this error handling isn't throwing my network error correctly
-      });
-  }
-
-//   function isValidEmail(email) {
-//     // Simple regex for basic email validation
-//     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     return re.test(email);
-// }  
 
 
+//register 
 
-const submitBtn = document.querySelector(".submit");
+// const submitBtn = document.querySelector(".submit");
 
-submitBtn.addEventListener("click", function () {
+function registerUser () {  
 const email = document.getElementById('email').value;
 const password = document.getElementById('password').value;
 const username = document.getElementById('username').value;
 const gender = document.getElementById('gender').value;
 const height = document.getElementById('height').value;
 const grade = document.getElementById('grade').value;
+const footerResult =document.querySelector('.footer-result')
+const form = document.querySelector('form');
 
 if (!email || !password || !username || !gender || !height || !grade) {
     alert("All fields are required!");
     return;
   }
 
-//   if (!isValidEmail(email)) {
-//     alert("Please enter a valid email address.");
-//     return;
-// }  
 const userUrl = "/api/user";
 fetch(userUrl, {
   method: "POST",
@@ -202,8 +157,17 @@ fetch(userUrl, {
   .then((response) => response.json())
   .then((data) => {
     if (data.ok) {
-      alert("Register Succesfully. Please Sign in.")
-      window.location.href ="/signin"
+      footerResult.innerHTML=`
+            <p>Register Succesfully</p>
+            <p>Sign in <a href="/signin">here</a></p>
+      `;
+      console.log("footerResult:", footerResult);
+      form.reset();
+
+      // alert("Register Successfully. Please sign in!");
+      // setTimeout(() => {
+      //   window.location.href = "/signin";
+      // }, 1000); // Delay of 1 second before redirecting
     } else {
       alert(`${data.message}`)
     }
@@ -212,4 +176,4 @@ fetch(userUrl, {
     console.error("Error:", err); 
   });
 
-})
+}
