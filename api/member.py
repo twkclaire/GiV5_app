@@ -344,3 +344,93 @@ async def get_member_data(memberId: int, token: dict = Depends(decodeJWT)):
         if db.is_connected():
             mycursor.close()
             db.close()
+
+
+
+@router.get("/api/achievement/{memberId}", tags=["achievement"])
+async def get_member_achievement(memberId: int):
+
+    try:
+        db = cnxpool.get_connection()
+        mycursor = db.cursor(dictionary=True)
+
+        # Monthly achievements query
+        sql = """
+        SELECT 
+            a.memberId,
+            a.routeId,
+            r.name,
+            r.grade,
+            r.available,
+            a.type,
+            a.date
+        FROM 
+            achievement a
+        INNER JOIN 
+            route r ON a.routeId = r.routeId
+        WHERE 
+            a.memberId = %s
+        ORDER BY 
+            a.date DESC;
+        """
+        mycursor.execute(sql, (memberId,))
+        results = mycursor.fetchall()
+
+
+
+
+        return {"data":results}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": True,
+                "message": f"Internal Server Error: {str(e)}"
+            }
+        )
+    finally:
+        if db.is_connected():
+            mycursor.close()
+            db.close()
+
+
+
+class DeleteAchievementRequest(BaseModel):
+    memberId: int
+    routeId: int
+
+@router.delete("/api/achievement/delete", tags=["achievement"])
+async def delete_achievement(request: DeleteAchievementRequest):
+    memberId = request.memberId
+    routeId = request.routeId
+    print("I got these from front end:", memberId, routeId)
+    try:
+        db = cnxpool.get_connection()
+        mycursor = db.cursor(dictionary=True)
+
+        # Monthly achievements query
+        sql = """
+        DELETE FROM achievement 
+        WHERE memberId=%s AND routeId=%s
+        """
+        mycursor.execute(sql, (memberId, routeId))
+        db.commit()
+
+        if mycursor.rowcount ==0:
+              raise HTTPException(status_code=404, detail="Record not found")
+
+        return {"ok":True}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": True,
+                "message": f"Internal Server Error: {str(e)}"
+            }
+        )
+    finally:
+        if db.is_connected():
+            mycursor.close()
+            db.close()
