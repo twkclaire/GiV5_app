@@ -222,7 +222,8 @@ document.getElementById("videoInput").addEventListener("change", async function(
     const file = this.files[0];
 
     if (file) {
-        console.log(file.name, file.type, "this is the routeId:", routeId)
+        
+        console.log(file.name, file.type, "this is the routeId:", routeId, "the new data:", file.size)
         try {
             document.getElementById("spinner").style.display = "block";
 
@@ -235,7 +236,8 @@ document.getElementById("videoInput").addEventListener("change", async function(
                 body: JSON.stringify({
                     file_name: file.name,
                     content_type: file.type,
-                    route_id:routeId
+                    route_id:routeId,
+                    file_size: file.size
                 })
             });
 
@@ -291,10 +293,12 @@ document.getElementById("videoInput").addEventListener("change", async function(
 
                     if (statusData.status === "completed") {
                         clearInterval(statusCheckInterval);
-                        displayNotification("Video process completed! Showing you in a second...");
                         console.log(`Video processing completed! You can watch it here: ${statusData.mpd_url}`)
                         // alert(`Video processing completed! You can watch it here: ${statusData.mpd_url}`);
-                        getVideo()
+                        displayNotification("Video process completed! Refreshing the page...");
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 5000); // Refreshes the page after 5 seconds
                     }else if(statusData.status === "failed"){
                         clearInterval(statusCheckInterval);
                         alert("Video processing failed!");

@@ -201,8 +201,13 @@ async def get_video(routeId:int):
             db =cnxpool.get_connection()
             mycursor = db.cursor(dictionary=True)  # Use dictionary=True to get results as dictionaries
             sql = """
-            SELECT * FROM video WHERE route_id=%s
+            SELECT * 
+			FROM video 
+			WHERE route_id = %s 
+				AND mpd_url != 'waiting'
+            ORDER BY video_id DESC;             
             """ 
+            #'waiting' to make sure in case video transcoding failed, this record won't show. 
             val = (routeId,)
             mycursor.execute(sql, val)
             videos = mycursor.fetchall()
