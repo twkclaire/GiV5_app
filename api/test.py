@@ -30,10 +30,12 @@ def read_root():
 class PresignedUrlRequest(BaseModel):
     file_name: str
     content_type: str
+    route_id:int
 
 class ProcessVideoRequest(BaseModel):
     route_id: int
     file_key: str
+    video_id: int
 
 
 # Step1: create a presigned url and send it back to frontend 
@@ -51,9 +53,14 @@ async def create_presigned_url(request: PresignedUrlRequest):
                 'Key': unique_file_name,
                 'ContentType': content_type
             },
-            ExpiresIn=3600  # URL expiration time in seconds
+            ExpiresIn=3600  #  expiration time 60 mins
         )
-        return {"presigned_url": presigned_url, "file_key": unique_file_name}
+
+        video_id = insert_initial_video_metadata(request.route_id, presigned_url)
+        if not video_id:
+            raise HTTPException(status_code=500, detail="Error inserting video metadata")
+        
+        return {"presigned_url": presigned_url, "file_key": unique_file_name, "video_id": video_id}
     except Exception as e:
         print(f"Error generating presigned URL: {e}")
         raise HTTPException(status_code=500, detail="Error generating presigned URL")
@@ -64,15 +71,66 @@ async def create_presigned_url(request: PresignedUrlRequest):
 async def process_video_in_background(request: ProcessVideoRequest, background_tasks: BackgroundTasks):
     route_id = request.route_id
     file_key = request.file_key
-    print(f"Received route_id: {route_id}, file_key: {file_key}")
-    background_tasks.add_task(process_video, route_id, file_key)
+    video_id= request.video_id
+    print(f"Received route_id: {route_id}, file_key: {file_key}, video_id:{video_id}")
+    background_tasks.add_task(process_video, route_id, file_key, video_id)
     return {"message": "Video processing started in the background"}
 
 
-def process_video(route_id: int, file_key: str):
+
+
+#Step3:polling to check transcode status
+@router.get("/api/route/video-status/{video_id}", tags=["video"])
+async def get_video_status(video_id: int):
+    if not video_id:
+        raise HTTPException(status_code=400, detail="No uploaded video found")
+    try:
+        db = cnxpool.get_connection()
+        cursor = db.cursor()
+        cursor.execute("SELECT status, mpd_url FROM video WHERE video_id = %s", (video_id,))
+        result = cursor.fetchone()
+        if result:
+            status, mpd_url = result #tupil unpack
+            return {"status": status, "mpd_url": mpd_url}
+        else:
+            raise HTTPException(status_code=404, detail="Video not found")
+    except Error as e:
+        print(f"Error retrieving video status: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+    finally:
+        if db.is_connected():
+            cursor.close()
+            db.close()
+
+def insert_initial_video_metadata(route_id, presigned_url):
+    try:
+        db = cnxpool.get_connection()
+        mycursor = db.cursor()
+        sql = """
+        INSERT INTO video (route_id, mpd_url, upload_date, status, presigned_url)
+        VALUES (%s, 'waiting', NOW(), 'pending', %s)
+        """
+        mycursor.execute(sql, (route_id, presigned_url))
+        db.commit()
+        return mycursor.lastrowid  # Return the ID of the newly inserted record
+    except Error as e:
+        print(f"Error inserting initial video metadata: {e}")
+        return None
+    finally:
+        if db.is_connected():
+            mycursor.close()
+            db.close()    
+
+
+
+def process_video(route_id: int, file_key: str, video_id:int):
     start_time = time.time()
     
     try:
+
+        # Step 0: Set status to 'processing' before starting download
+        update_video_status('processing',video_id)
+
         # Step 1: Download the file from S3
         local_file_path = os.path.join("/tmp", file_key)
         s3_client.download_file(BUCKET_NAME, file_key, local_file_path)
@@ -110,7 +168,7 @@ def process_video(route_id: int, file_key: str):
 
         # Step 4: Store metadata in the database
         mpd_url = f"https://{CLOUDFRONT_DOMAIN}/{hls_filename}/{hls_filename}.mpd"
-        insert_video_metadata(route_id, mpd_url)
+        update_video_metadata(video_id, mpd_url)
 
         end_time = time.time()
         duration = end_time - start_time
@@ -119,6 +177,7 @@ def process_video(route_id: int, file_key: str):
 
     except Exception as e:
         print(f"An error occurred during video processing: {e}")
+        update_video_status('failed', video_id)
 
     finally:
         # Clean up temporary files
@@ -130,24 +189,46 @@ def process_video(route_id: int, file_key: str):
 
 
 
-
-def insert_video_metadata(route_id, mpd_url, member_id=None):
+def update_video_status(status, video_id):
     try:
         db =cnxpool.get_connection()
         mycursor = db.cursor()
         sql = """
-        INSERT INTO video (route_id, mpd_url, upload_date, member_id)
-        VALUES (%s, %s,  NOW(), %s)
+        UPDATE video 
+        SET status = %s 
+        WHERE video_id = %s 
         """    
-        mycursor.execute(sql, (route_id, mpd_url, member_id))
+        mycursor.execute(sql, (status, video_id))
         db.commit()
     
     except Error as e:
-        print(f"Error: {e}")
+        print(f"Error updating video status: {e}")
     
     finally:
         if db.is_connected():
             mycursor.close()
             db.close()
+
+def update_video_metadata(video_id, mpd_url):
+    try:
+        db =cnxpool.get_connection()
+        mycursor = db.cursor()
+        sql = """
+        UPDATE video 
+        SET mpd_url = %s, status = %s 
+        WHERE video_id = %s 
+        """    
+        mycursor.execute(sql, (mpd_url,"completed", video_id))
+        db.commit()
+    
+    except Error as e:
+        print(f"Error updating video metadata: {e}")
+    
+    finally:
+        if db.is_connected():
+            mycursor.close()
+            db.close()
+
+
 
 
