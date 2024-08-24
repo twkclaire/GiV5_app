@@ -6,49 +6,116 @@ const savedUrl = `/api/save/${memberId}`;
 const personalInfoWrap = document.querySelector(".personal-info-wrap");
 const todoCardWrap = document.querySelector(".todo-card-wrap");
 
-function getSavedRoute() {
-    fetch(savedUrl)
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(error => {
-                    throw new Error(error.message);
-                });
-            }
-            return response.json();
+var userId=""
+window.onload = function checkSigninStatus() {
+    const token = localStorage.getItem("token");
+    let content="";
+    const dropdownContent=document.querySelector(".dropdown-content");
+  
+    if (token) {
+      fetch("/api/user/auth", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((resp) => {
+          if (!resp.ok) {
+            return resp.json().then((data) => {
+              throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
+            });
+          }
+          return resp.json();
         })
-        .then(data => {
-            let mainHTML = "";
-            if (data.data.length === 0) {
-                mainHTML = "<div class='no-data'>You don't have anything saved yet!</div>";
-                todoCardWrap.innerHTML = mainHTML;
-                return;
-            }
+        .then((data) => {
+            userId=data.data.id
+            console.log("Fetch successful:", data);
+            document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
+            userId=data.data.id
+            console.log("is this the user id:",userId)
+            content +=`
+                    <a href="#" onclick="deleteToken(); return false;">Log out</a>
+            `  
+            dropdownContent.innerHTML += content;
 
-            data.data.forEach(route => {
-                mainHTML += `
-                    <div class="card-wrap" data-route-id="${route.routeId}" onclick="navigateToRoute(this)">
-                        <a href="/route/${route.routeId}" class="card-link"></a>
-                        <div class="card-grade"><div>${route.routeGrade}</div></div>
-                        <div class="card-name">
-                            <p>${route.routeId}. ${route.routeName}</p>
-                            <div class="card-detail">
-                                <p>${route.expiredDate}</p>
+        })
+        .catch((err) => {
+          console.error("Error:", err.message);
+        });
+    } else {
+      console.error("Token not found");
+      content +=`
+                <a href="/signin">Sign in</a>
+                <a href="/register">Sign up</a>
+
+          `  
+          dropdownContent.innerHTML += content;
+    }
+  };
+
+  function deleteToken() {
+    let token = localStorage.removeItem("token");
+    console.log("user signed out");
+    window.location.reload();
+    return token;
+  }
+
+
+
+
+function getSavedRoute() {
+    const token = localStorage.getItem("token");
+    if(token){
+        fetch(savedUrl,{
+                method:"GET",
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw new Error(error.message);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                let mainHTML = "";
+                if (data.data.length === 0) {
+                    mainHTML = "<div class='no-data'>You don't have anything saved yet!</div>";
+                    todoCardWrap.innerHTML = mainHTML;
+                    return;
+                }
+
+                data.data.forEach(route => {
+                    mainHTML += `
+                        <div class="card-wrap" data-route-id="${route.routeId}" onclick="navigateToRoute(this)">
+                            <a href="/route/${route.routeId}" class="card-link"></a>
+                            <div class="card-grade"><div>${route.routeGrade}</div></div>
+                            <div class="card-name">
+                                <p>${route.routeId}. ${route.routeName}</p>
+                                <div class="card-detail">
+                                    <p>${route.expiredDate}</p>
+                                </div>  
+                            </div>
+                            <div class="card-btn-wrap">
+                                <button onclick="handleButtonClick(event, 0, ${route.routeId})">Flash</button>
+                                <button onclick="handleButtonClick(event, 1, ${route.routeId})">Done</button>
+                                <button onclick="deleteRoute(event, '${route.routeId}', this)"><img src="/static/images/cross.svg"></button>
                             </div>  
                         </div>
-                        <div class="card-btn-wrap">
-                            <button onclick="handleButtonClick(event, 0, ${route.routeId})">Flash</button>
-                            <button onclick="handleButtonClick(event, 1, ${route.routeId})">Done</button>
-                            <button onclick="deleteRoute(event, '${route.routeId}', this)"><img src="/static/images/cross.svg"></button>
-                        </div>  
-                    </div>
-                `;
-            });
+                    `;
+                });
 
-            todoCardWrap.innerHTML = mainHTML;
-        })
-        .catch(error => {
-            console.error('Error fetching saved routes:', error);
-        });
+                todoCardWrap.innerHTML = mainHTML;
+            })
+            .catch(error => {
+                console.error('Error fetching saved routes:', error);
+            });
+        }else{
+            alert("please sign in!")
+            window.location.href ="/signin";
+        }        
 }
 
 function navigateToRoute(element) {
@@ -133,48 +200,58 @@ async function handleButtonClick(event, type, routeId) {
 }
 
 function getMemberData() {
-    return fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(error => {
-                    throw new Error(error.message);
-                });
-            }
-            return response.json();
+    const token = localStorage.getItem("token");
+    if(token){
+        return fetch(url,{
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
         })
-        .then(data => {
-            // Prepare the HTML for personal-info-wrap
-            const initial = data.username[0];
-            const username = data.username;
-            const height = data.height;
-            const gender = data.gender;
-            const grade = data.grade;
-            const done = data.done;
-            const flash = data.flash;
-            
-            const personalInfoHTML = `
-                <div class="personal-image-wrap">
-                    <div class="personal-image">${initial}</div>
-                </div>
-                <div class="personal-info">
-                    <div class="personal-name"><h2>${username}</h2></div>
-                    <div class="personal-data">
-                        <p>${height} cm</p>
-                        <p>${grade}</p>
-                        <p>${gender}</p>
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw new Error(error.message);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Prepare the HTML for personal-info-wrap
+                const initial = data.username[0];
+                const username = data.username;
+                const height = data.height;
+                const gender = data.gender;
+                const grade = data.grade;
+                const done = data.done;
+                const flash = data.flash;
+                
+                const personalInfoHTML = `
+                    <div class="personal-image-wrap">
+                        <div class="personal-image">${initial}</div>
                     </div>
-                    <div class="personal-number">
-                        <p>Flash: ${flash}</p>
-                        <p>Done: ${done}</p>
+                    <div class="personal-info">
+                        <div class="personal-name"><h2>${username}</h2></div>
+                        <div class="personal-data">
+                            <p>${height} cm</p>
+                            <p>${grade}</p>
+                            <p>${gender}</p>
+                        </div>
+                        <div class="personal-number">
+                            <p>Flash: ${flash}</p>
+                            <p>Done: ${done}</p>
+                        </div>
                     </div>
-                </div>
-            `;
-  
-            personalInfoWrap.innerHTML = personalInfoHTML;
-        })
-        .catch(error => {
-            console.error('Error fetching member data:', error);
-        });
+                `;
+    
+                personalInfoWrap.innerHTML = personalInfoHTML;
+            })
+            .catch(error => {
+                console.error('Error fetching member data:', error);
+            });
+    }else{
+        alert("please sign in!")
+    }    
 }
 
 function updateCounts(flash, done) {
@@ -193,109 +270,148 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    fetch(`/api/data/${memberId}`)
-        .then(response => response.json())
-        .then(data => {
-            // Monthly achievement chart
-            const flash = data.data.monthly_achievement.flash;
-            const done = data.data.monthly_achievement.done;
+    const token = localStorage.getItem("token");
+    if(token){
+        fetch(`/api/data/${memberId}`,{
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Monthly achievement chart
+                const flash = data.data.monthly_achievement.flash;
+                const done = data.data.monthly_achievement.done;
 
-            const ctxMonth = document.getElementById('monthChart').getContext('2d');
-            new Chart(ctxMonth, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Flash', 'Done'],
-                    datasets: [{
-                        data: [flash, done],
-                        backgroundColor: ['rgba(193,28,132, 1)', 'rgba(34,34,34, 1)'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(tooltipItem) {
-                                    return tooltipItem.label + ': ' + tooltipItem.raw;
-                                }
-                            }
-                        },
-                        datalabels: {
-                            color: '#fff',
-                            display: true,
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: (value) => value,
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Your achievement this month',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
+                const ctxMonth = document.getElementById('monthChart').getContext('2d');
+                new Chart(ctxMonth, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Flash', 'Done'],
+                        datasets: [{
+                            data: [flash, done],
+                            backgroundColor: ['rgba(193,28,132, 1)', 'rgba(34,34,34, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 10,
+                                bottom:20
                             },
-                            color: '#333',
-                            padding: {
-                                bottom: 10
+                            font:{
+                                size:16,
+                                weight:'bold'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.label + ': ' + tooltipItem.raw;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                color: '#fff',
+                                display: true,
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: (value) => value,
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Your achievement this month',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                color: '#333',
+                                padding: {
+                                    bottom: 10
+                                }
                             }
                         }
                     }
-                }
+                });
+
+                // All-time achievement chart
+                const expectedOrder = ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9"];
+
+                const allTimeAchievement = data.data.all_time_achievement;
+    
+                // Sort the keys based on the expected order
+                const labels = expectedOrder.filter(grade => allTimeAchievement.hasOwnProperty(grade));
+                const flashData = labels.map(grade => allTimeAchievement[grade].flash);
+                const doneData = labels.map(grade => allTimeAchievement[grade].done);
+    
+                const ctxThreeMonth = document.getElementById('threeMonthChart').getContext('2d');
+                new Chart(ctxThreeMonth, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Flash',
+                                data: flashData,
+                                backgroundColor: 'rgba(193,28,132, 1)',
+                            },
+                            {
+                                label: 'Done',
+                                data: doneData,
+                                backgroundColor: 'rgba(34,34,34, 1)',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'All Time Achievement',
+                                padding: {
+                                    top: 10,
+                                    bottom: 20
+                                },
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true
+                            },
+                            y: {
+                                stacked: true,
+                                ticks: {
+                                    // Configure y-axis ticks to display only integers
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        // Format the tick value to be an integer
+                                        return Number.isInteger(value) ? value : '';
+                                    }
+                                }
+                
+
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
             });
-
-            // All-time achievement chart
-             const expectedOrder = ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9"];
-
-             const allTimeAchievement = data.data.all_time_achievement;
- 
-             // Sort the keys based on the expected order
-             const labels = expectedOrder.filter(grade => allTimeAchievement.hasOwnProperty(grade));
-             const flashData = labels.map(grade => allTimeAchievement[grade].flash);
-             const doneData = labels.map(grade => allTimeAchievement[grade].done);
- 
-             const ctxThreeMonth = document.getElementById('threeMonthChart').getContext('2d');
-             new Chart(ctxThreeMonth, {
-                 type: 'bar',
-                 data: {
-                     labels: labels,
-                     datasets: [
-                         {
-                             label: 'Flash',
-                             data: flashData,
-                             backgroundColor: 'rgba(193,28,132, 1)',
-                         },
-                         {
-                             label: 'Done',
-                             data: doneData,
-                             backgroundColor: 'rgba(34,34,34, 1)',
-                         }
-                     ]
-                 },
-                 options: {
-                     responsive: true,
-                     maintainAspectRatio: false,
-                     scales: {
-                         x: {
-                             stacked: true
-                         },
-                         y: {
-                             stacked: true
-                         }
-                     }
-                 }
-             });
-         })
-         .catch(error => {
-             console.error('Error fetching data:', error);
-         });
+    }else{
+        alert("please log in first!")
+    }     
  });
 

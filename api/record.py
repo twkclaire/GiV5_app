@@ -10,7 +10,10 @@ from mysql.connector import Error
 router=APIRouter()
 
 
-
+class DeleteRoute(BaseModel):
+	memberId:int
+	routeId:int
+      
 class RouteSave(BaseModel):
 	memberId:int
 	routeId:int
@@ -53,9 +56,7 @@ async def savedRoute(route:RouteSave):
 		db.close()
 
 
-class DeleteRoute(BaseModel):
-	memberId:int
-	routeId:int
+
 
 
 
@@ -113,6 +114,15 @@ async def routeDone(done:DoneRoute):
 
 			return {"ok":True}
 		else:
+			sql="""
+			Update achievement 
+            SET type =%s
+            WHERE routeId=%s AND memberId=%s      
+			"""
+			val=(done.type, done.routeId, done.memberId)
+			mycursor.execute(sql,val)
+			db.commit()
+                              
 			return{"ok":False}
 	
 	except Exception as e:

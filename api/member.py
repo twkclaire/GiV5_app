@@ -148,7 +148,13 @@ async def getUser(token:dict =Depends(decodeJWT)):
 
 
 @router.get("/api/member/{memberId}",tags=["Member"])
-async def getMember(memberId:int):
+async def getMember(memberId:int, token: dict = Depends(decodeJWT)):
+        if isinstance(token, JSONResponse):
+              return token
+        
+        frontend_memberId=token["id"]
+        if frontend_memberId != memberId:
+              raise HTTPException(status_code=403, detail="Access forbidden")
         try:
             db =cnxpool.get_connection()
             mycursor = db.cursor()
@@ -196,7 +202,14 @@ async def getMember(memberId:int):
 
 
 @router.get("/api/save/{memberId}", tags=["Member"])
-async def getMemberRoute(memberId:int):
+async def getMemberRoute(memberId:int, token: dict = Depends(decodeJWT)):
+    if isinstance(token, JSONResponse):
+          return token
+    
+    frontend_memberId=token["id"]
+    if frontend_memberId != memberId:
+          raise HTTPException(status_code=403, detail="Access forbidden")
+
     try:
         db =cnxpool.get_connection()
         mycursor = db.cursor()
@@ -250,7 +263,15 @@ async def getMemberRoute(memberId:int):
 
 
 @router.get("/api/data/{memberId}")
-async def get_member_data(memberId: int):
+async def get_member_data(memberId: int, token: dict = Depends(decodeJWT)):
+    if isinstance(token, JSONResponse):
+          return token
+    
+    frontend_memberId=token["id"]
+    if frontend_memberId != memberId:
+          raise HTTPException(status_code=403, detail="Access forbidden")
+
+
     try:
         db = cnxpool.get_connection()
         mycursor = db.cursor(dictionary=True)

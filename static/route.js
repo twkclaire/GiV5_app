@@ -55,74 +55,163 @@ function getData(){
 
 }  
 
+document.addEventListener("DOMContentLoaded", function() {
+    const videoElement = document.getElementById('video'); 
+    if (!videoElement) {
+        console.error('Video element not found!');
+        return;
+    }
 
+    let videos = [];
+    let currentVideoIndex = 0;
 
-// fetching video
-
-function getVideo(){
-  fetch(videourl)
-  .then(response => response.json())
-  .then(data => {
-    console.log("am I successful fetching video??",data)
-      if (data.videos.length === 0) {
-          // Display "add a video" image or message
-          document.querySelector('.video-wrap').classList.remove('show');
-          document.querySelector('.video-image-wrap').classList.add('show');
-          console.log("Video wrap classes:", document.querySelector('.video-wrap').className);
-          console.log("Image wrap classes:", document.querySelector('.video-image-wrap').className);
-          console.log("we have no video found")
-
-      } else {
-          // Display the videos
-          document.querySelector('.video-wrap').classList.add('show');
-          document.querySelector('.video-image-wrap').classList.remove('show');
-          let Url=data.videos[0].mpd_url
-          initApp(Url)
-          console.log("we found some videos")
-
-      }
-  })
-  .catch(error => {
-      console.error('Error fetching videos:', error);
-  });
-}
-
-
-
-// initialising player
-async function initApp(url) {
+    // Initialize Shaka Player
+    async function initApp(url) {
         shaka.polyfill.installAll();
+
         if (shaka.Player.isBrowserSupported()) {
-            playVideo(url);
+            const player = new shaka.Player(videoElement);
+            window.player = player; // Make the player accessible for debugging
+            // player.addEventListener('error', onErrorEvent);
+
+            try {
+                await player.load(url);
+                // console.log('The video has now been loaded and is playing!');
+            } catch (error) {
+                console.error('Error loading video:', error);
+            }
         } else {
             console.error('Browser not supported!');
         }
     }
 
+    // function onErrorEvent(event) {
+    //     console.error('Error code', event.detail.code, 'object', event.detail);
+        
+    // }
 
-async function playVideo(url) {
-        const videoElement = document.getElementById('video');
-        const player = new shaka.Player(videoElement);
-
-        try {
-            await player.load(url);
-            console.log('The video has now been loaded and is playing!');
-        } catch (error) {
-
-            console.log(error);
+    function loadVideo(index) {
+        if (index >= 0 && index < videos.length) {
+            const url = videos[index].mpd_url;
+            console.log(`Attempting to play: ${url}`);
+            initApp(url);
+            updateVideoStatus();
         }
     }
+
+    fetch(videourl) 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            videos = data.videos;
+            console.log("Videos fetched successfully:", videos);
+            if (videos.length > 0) loadVideo(currentVideoIndex);
+            else console.log('No videos available.');
+        })
+        .catch(error => {
+            console.error('Failed to fetch videos:', error);
+        });
+
+    document.getElementById('prevVideo')?.addEventListener('click', () => {
+        console.log('Prev button clicked');
+        if (currentVideoIndex > 0) {
+            currentVideoIndex--;
+            loadVideo(currentVideoIndex);
+        }
+    });
+
+    document.getElementById('nextVideo')?.addEventListener('click', () => {
+        console.log('Next button clicked');
+        if (currentVideoIndex < videos.length - 1) {
+            currentVideoIndex++;
+            loadVideo(currentVideoIndex);
+        }
+    });
+
+    function updateVideoStatus() {
+        console.log(`Playing video ${currentVideoIndex + 1} of ${videos.length}`);
+    }
+});
+
+
+
+
+// this is my coddddd// this is my coddddd// this is my coddddd// this is my coddddd
+// fetching video
+
+// function getVideo(){
+//   fetch(videourl)
+//   .then(response => response.json())
+//   .then(data => {
+//     console.log("am I successful fetching video??",data)
+//       if (data.videos.length === 0) {
+//           // Display "add a video" image or message
+//           document.querySelector('.video-wrap').classList.remove('show');
+//           document.querySelector('.video-image-wrap').classList.add('show');
+//           console.log("Video wrap classes:", document.querySelector('.video-wrap').className);
+//           console.log("Image wrap classes:", document.querySelector('.video-image-wrap').className);
+//           console.log("we have no video found")
+
+//       } else {
+//           // Display the videos
+//           document.querySelector('.video-wrap').classList.add('show');
+//           document.querySelector('.video-image-wrap').classList.remove('show');
+//           let Url=data.videos[0].mpd_url
+//           initApp(Url)
+//           console.log("we found some videos")
+
+//       }
+//   })
+//   .catch(error => {
+//       console.error('Error fetching videos:', error);
+//   });
+// }
+// getVideo()
+
+
+// initialising player
+// async function initApp(url) {
+//         shaka.polyfill.installAll();
+//         if (shaka.Player.isBrowserSupported()) {
+//             playVideo(url);
+//         } else {
+//             console.error('Browser not supported!');
+//         }
+//     }
+
+
+// async function playVideo(url) {
+//         const videoElement = document.getElementById('video');
+//         const player = new shaka.Player(videoElement);
+
+//         try {
+//             await player.load(url);
+//             console.log('The video has now been loaded and is playing!');
+//         } catch (error) {
+
+//             console.log(error);
+//         }
+//     }
 
 
 
 getData()
-getVideo()
+
 
 
 // updated upload function using presigned url and trigger background process
 
 document.getElementById("uploadButton").addEventListener("click", function() {
-    document.getElementById("videoInput").click();
+    const token = localStorage.getItem("token");
+    if(token){
+        document.getElementById("videoInput").click();
+    }else{
+        alert("please log in first!")
+    }    
 });
 
 document.getElementById("videoInput").addEventListener("change", async function() {
@@ -141,13 +230,15 @@ document.getElementById("videoInput").addEventListener("change", async function(
                 },
                 body: JSON.stringify({
                     file_name: file.name,
-                    content_type: file.type
+                    content_type: file.type,
+                    route_id:routeId
                 })
             });
 
             const data = await response.json();
             const presignedUrl = data.presigned_url;
             const fileKey = data.file_key;
+            const videoId =data.video_id;
 
             // Step 2: Upload the video file to S3 using the presigned URL
             await fetch(presignedUrl, {
@@ -166,14 +257,52 @@ document.getElementById("videoInput").addEventListener("change", async function(
                 },
                 body: JSON.stringify({
                     route_id: routeId,  
-                    file_key: fileKey
+                    file_key: fileKey,
+                    video_id: videoId
                 })
             });
 
             const processResult = await processResponse.json();
             console.log("Video processing initiated:", processResult);
+            displayStatus(processResult);
 
-            alert("Video uploaded and processing started successfully!");
+            displayNotification("Video uploaded. Stay on the page to process the video!");
+
+            // alert("Video uploaded and processing started successfully!");
+
+            // Step 4: Polling to check video process status 
+            const statusCheckInterval = setInterval(async () => {
+                if (!videoId){
+                    console.error("videoId is not defined");
+                    return; // Exit if videoId is not valid                
+                }
+                try {
+                    const statusResponse = await fetch(`/api/route/video-status/${videoId}`);
+                    if (!statusResponse.ok) {
+                        throw new Error("Failed to get video status");
+                    }
+                    const statusData = await statusResponse.json();
+                    console.log("Status Data:", statusData);
+                    displayStatus(statusData.status)
+
+                    if (statusData.status === "completed") {
+                        clearInterval(statusCheckInterval);
+                        displayNotification("Video process completed! Showing you in a second...");
+                        console.log(`Video processing completed! You can watch it here: ${statusData.mpd_url}`)
+                        // alert(`Video processing completed! You can watch it here: ${statusData.mpd_url}`);
+                        getVideo()
+                    }else if(statusData.status === "failed"){
+                        clearInterval(statusCheckInterval);
+                        alert("Video processing failed!");
+
+                    }
+                } catch (error) {
+                    console.error("Status check failed:", error);
+                    clearInterval(statusCheckInterval); // Ensure interval is cleared on error
+                    alert("An error occurred while checking video status.");
+                }
+            }, 10000); // Check every 10 seconds
+
 
         } catch (error) {
             console.error("Upload or processing failed:", error);
@@ -208,8 +337,8 @@ function handleSave() {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        memberId: userId,  // Replace with actual data
-                        routeId: routeId, // Replace with actual data
+                        memberId: userId,  
+                        routeId: routeId, 
 
                     }),
                 })
@@ -218,8 +347,10 @@ function handleSave() {
                     result=data.ok
                     if (result == true){
                     console.log("Saved Successfuly!")
+                    displayNotification("Route saved successfully!");
                     } else {
                     console.log("This is saved already!")
+                    displayNotification("This route is saved. Check all saved route at My Page.");
                     }
 
                 })
@@ -230,6 +361,42 @@ function handleSave() {
                 alert("please log in first!")
             }
         }   
+
+
+function displayNotification(message) {
+    const notification = document.getElementById("notification");
+    notification.innerText = message;
+    notification.style.display = "block";
+    setTimeout(() => {
+        notification.style.display = "none";
+    }, 3000); // Hide notification after 3 seconds
+}
+
+// function displayStatus(message) {
+//     const statusUpdate = document.getElementById("status-update");
+//     statusUpdate.innerText = `Video processing status: ${message} `;
+//     statusUpdate.style.display = "block";
+// }
+
+function displayStatus(message) {
+    const statusUpdate = document.getElementById("status-update");
+    const loaderContainer = document.getElementById("loader-container");
+
+    if (message === "processing") {
+        statusUpdate.style.display = "block";
+        statusUpdate.classList.add("processing");
+        statusUpdate.classList.remove("completed");
+        statusUpdate.innerHTML = 'Video processing status: Processing';
+        loaderContainer.style.display = "block"; // Show loader
+    } else if (message === "completed") {
+        statusUpdate.style.display = "block";
+        statusUpdate.classList.add("completed");
+        statusUpdate.classList.remove("processing");
+        statusUpdate.innerHTML = 'Video processing status: Completed';
+        loaderContainer.style.display = "none"; // Hide loader
+    }
+}
+
 
 async function handleButtonClick(type) {
     console.log("flashdone check userId:",userId)
@@ -254,9 +421,11 @@ async function handleButtonClick(type) {
 
                 if (response.ok) {
                     if (data.ok){
-                        console.log("Record created succesfully")
+                        // console.log("flash/done")
+                        displayNotification("Congrats!");
                     }else{
-                        console.log("Record already exists!")
+                        console.log("double click, change record")
+                        displayNotification("Your record is changed");
                     }
                 }
             } catch (error) {
