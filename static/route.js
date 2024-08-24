@@ -224,6 +224,14 @@ document.getElementById("videoInput").addEventListener("change", async function(
     if (file) {
         
         console.log(file.name, file.type, "this is the routeId:", routeId, "the new data:", file.size)
+        // Check file size before making a request
+        const MAX_FILE_SIZE_MB = 50;
+        const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+        
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+            alert(`File size exceeds ${MAX_FILE_SIZE_MB} MB limit.`);
+            return; // Exit early if file is too large
+        }
         try {
             document.getElementById("spinner").style.display = "block";
 
@@ -241,6 +249,9 @@ document.getElementById("videoInput").addEventListener("change", async function(
                 })
             });
 
+            if (!response.ok) {
+                throw new Error(`Failed to get presigned URL. Status: ${response.status}`);
+            }
             const data = await response.json();
             const presignedUrl = data.presigned_url;
             const fileKey = data.file_key;
@@ -254,6 +265,10 @@ document.getElementById("videoInput").addEventListener("change", async function(
                     "Content-Type": file.type
                 }
             });
+
+            if (!response.ok) {
+                throw new Error("Failed to upload file");
+            }
 
             // Step 3: Notify the backend to start processing the video
             const processResponse = await fetch("/api/route/process-video", {
@@ -270,9 +285,10 @@ document.getElementById("videoInput").addEventListener("change", async function(
 
             const processResult = await processResponse.json();
             console.log("Video processing initiated:", processResult);
-            displayStatus(processResult);
+            // displayStatus(processResult);
 
             displayNotification("Video uploaded. Stay on the page to process the video!");
+            displayStatus("initiating")
 
             // alert("Video uploaded and processing started successfully!");
 
@@ -323,6 +339,30 @@ document.getElementById("videoInput").addEventListener("change", async function(
 
 
 
+
+function displayStatus(message) {
+    const statusUpdate = document.getElementById("status-update");
+    const loaderContainer = document.getElementById("loader-container");
+
+    if (message === "processing") {
+        statusUpdate.style.display = "block";
+        statusUpdate.classList.add("processing");
+        statusUpdate.classList.remove("completed");
+        statusUpdate.innerHTML = 'Video processing status: Processing';
+        loaderContainer.style.display = "block"; // Show loader
+    } else if (message === "completed") {
+        statusUpdate.style.display = "block";
+        statusUpdate.classList.add("completed");
+        statusUpdate.classList.remove("processing");
+        statusUpdate.innerHTML = 'Video processing status: Completed';
+        loaderContainer.style.display = "none"; // Hide loader
+    } else if(message === "initiating"){
+        statusUpdate.style.display = "block";
+        statusUpdate.classList.add("processing");
+        statusUpdate.innerHTML = 'Video processing status: Initiating';
+        loaderContainer.style.display = "block"; 
+    }
+}
 
 
 const routeSaveBtn = document.getElementById("route-save-btn");
@@ -386,24 +426,7 @@ function displayNotification(message) {
 //     statusUpdate.style.display = "block";
 // }
 
-function displayStatus(message) {
-    const statusUpdate = document.getElementById("status-update");
-    const loaderContainer = document.getElementById("loader-container");
 
-    if (message === "processing") {
-        statusUpdate.style.display = "block";
-        statusUpdate.classList.add("processing");
-        statusUpdate.classList.remove("completed");
-        statusUpdate.innerHTML = 'Video processing status: Processing';
-        loaderContainer.style.display = "block"; // Show loader
-    } else if (message === "completed") {
-        statusUpdate.style.display = "block";
-        statusUpdate.classList.add("completed");
-        statusUpdate.classList.remove("processing");
-        statusUpdate.innerHTML = 'Video processing status: Completed';
-        loaderContainer.style.display = "none"; // Hide loader
-    }
-}
 
 
 async function handleButtonClick(type) {
