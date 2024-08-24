@@ -57,10 +57,8 @@ function getData(){
 
 document.addEventListener("DOMContentLoaded", function() {
     const videoElement = document.getElementById('video'); 
-    if (!videoElement) {
-        console.error('Video element not found!');
-        return;
-    }
+    const videoSlider = document.querySelector('.video-slider');
+    const videoImageWrap = document.querySelector('.video-image-wrap');
 
     let videos = [];
     let currentVideoIndex = 0;
@@ -85,11 +83,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // function onErrorEvent(event) {
-    //     console.error('Error code', event.detail.code, 'object', event.detail);
-        
-    // }
-
     function loadVideo(index) {
         if (index >= 0 && index < videos.length) {
             const url = videos[index].mpd_url;
@@ -107,10 +100,21 @@ document.addEventListener("DOMContentLoaded", function() {
             return response.json();
         })
         .then(data => {
+            console.log('Fetched videos data:', data);
             videos = data.videos;
             console.log("Videos fetched successfully:", videos);
-            if (videos.length > 0) loadVideo(currentVideoIndex);
-            else console.log('No videos available.');
+            if (videos.length ===0){
+                console.log(videos)
+                videoSlider.classList.remove('show');
+                videoImageWrap.classList.add('show');
+                console.log('No videos available!.');
+            } 
+            else{ 
+                console.log(videos)
+                videoSlider.classList.add('show');
+                videoImageWrap.classList.remove('show');
+                loadVideo(currentVideoIndex);
+            }    
         })
         .catch(error => {
             console.error('Failed to fetch videos:', error);
