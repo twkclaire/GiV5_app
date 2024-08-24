@@ -26,6 +26,9 @@ async def route(request: Request):
 async def member(request: Request):
 	return FileResponse("./templates/member.html", media_type="text/html")
 
+@app.get("/achievement/{id}", include_in_schema=False)
+async def member(request: Request):
+	return FileResponse("./templates/achievement.html", media_type="text/html")
 
 @app.get("/register", include_in_schema=False)
 async def video(request: Request):
@@ -36,10 +39,13 @@ async def video(request: Request):
 	return FileResponse("./templates/signin.html", media_type="text/html")
 
 
-# @app.get("/test", include_in_schema=False)
-# async def video(request: Request):
-# 	return FileResponse("./static/test.html", media_type="text/html")
+@app.get("/test", include_in_schema=False)
+async def video(request: Request):
+	return FileResponse("./templates/test.html", media_type="text/html")
 
+@app.get("/test_admin", include_in_schema=False)
+async def video(request: Request):
+	return FileResponse("./templates/test_admin.html", media_type="text/html")
 
 
 ##compontnet that shouldn't be a page itself
