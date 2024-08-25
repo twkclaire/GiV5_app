@@ -121,17 +121,17 @@ async def login(user:UserLogIn):
 					else:
 						return JSONResponse(
 							status_code=400, 
-							content={"error":True, "message":"Email或密碼有誤"}
+ 							content={"error":True, "message":"Email or password invalid"}
 							) 
 			else:
 				return JSONResponse(
 					status_code=400, 
-					content={"error":True, "message":"Email或密碼有誤"}
+					content={"error":True, "message":"Email or password invalid"}
 					) 
 		except Exception:
 			return JSONResponse(
 				status_code=500, 
-				content={"error":True, "message":"伺服器內部錯誤"}
+				content={"error":True, "message":"Internal Server Error"}
 				)
 		finally:
 			db.close()

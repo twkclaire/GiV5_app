@@ -45,11 +45,12 @@ submitBtn.addEventListener("click", function(event) {
             console.log(JWTtoken);
             localStorage.setItem("token", JWTtoken);
             console.log("Login successful!");
+            alert("Login succesfully!")
             // signInResult.innerText = "Login successful!";
             window.location.href = "/"
         } else {
             console.log(data.message);
-            // signInResult.innerText = data.message;
+            alert(data.message)
         }
     })
     .catch((err) => {
