@@ -348,8 +348,10 @@ async def get_member_data(memberId: int, token: dict = Depends(decodeJWT)):
 
 
 @router.get("/api/achievement/{memberId}", tags=["achievement"])
-async def get_member_achievement(memberId: int):
-
+async def get_member_achievement(memberId: int, token:dict = Depends(decodeJWT)):
+    if isinstance(token, JSONResponse):
+      return token
+    
     try:
         db = cnxpool.get_connection()
         mycursor = db.cursor(dictionary=True)
@@ -376,10 +378,15 @@ async def get_member_achievement(memberId: int):
         mycursor.execute(sql, (memberId,))
         results = mycursor.fetchall()
 
-
-
-
-        return {"data":results}
+        sql="SELECT username FROM member WHERE memberId= %s"
+        mycursor.execute(sql,(memberId,))
+        name= mycursor.fetchone()
+        frontend_memberId=token["id"]
+        if frontend_memberId == memberId:
+            return {"data":results, "undo": True, "name":name}
+        else:
+            
+            return{"data":results, "undo": False, "name": name}
 
     except Exception as e:
         return JSONResponse(
