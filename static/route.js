@@ -223,7 +223,7 @@ document.getElementById("videoInput").addEventListener("change", async function(
 
     if (file) {
         
-        console.log(file.name, file.type, "this is the routeId:", routeId, "the new data:", file.size)
+        console.log(file.name, file.type, "this is the routeId:", routeId, "the new data:", file.size, "userid:", userId)
         // Check file size before making a request
         const MAX_FILE_SIZE_MB = 50;
         const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -245,7 +245,8 @@ document.getElementById("videoInput").addEventListener("change", async function(
                     file_name: file.name,
                     content_type: file.type,
                     route_id:routeId,
-                    file_size: file.size
+                    file_size: file.size,
+                    member_id: userId,
                 })
             });
 
@@ -288,7 +289,7 @@ document.getElementById("videoInput").addEventListener("change", async function(
             // displayStatus(processResult);
 
             displayNotification("Video uploaded. Stay on the page to process the video!");
-            displayStatus("initiating")
+            // displayStatus("initiating")
 
             // alert("Video uploaded and processing started successfully!");
 
@@ -489,6 +490,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function createUserCard(user) {
         const userCardWrap = document.createElement('div');
         userCardWrap.className = 'user-card-wrap';
+        userCardWrap.setAttribute('data-member-id', user.memberId);
+
 
         userCardWrap.innerHTML = `
             <div class="user-card-grade">
@@ -508,8 +511,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+        userCardWrap.addEventListener('click', function() {
+            navigateToRoute(user.memberId);
+        });
 
         return userCardWrap;
+
     }
 
     function displayData(data) {
@@ -534,9 +541,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`/api/done/${routeId}`) 
         .then(response => response.json())
         .then(responseData => {
-            const dataArray = responseData.data || []; // Default to empty array if data is undefined
+            const dataArray = responseData.data 
+            console.log(dataArray)
             displayData(dataArray);
         })
         .catch(handleError);
 });
 
+function navigateToRoute(memberId) {
+    window.location.href = `/achievement/${memberId}`;
+}
