@@ -158,7 +158,7 @@ fetch(userUrl, {
   .then((data) => {
     if (data.ok) {
       footerResult.innerHTML=`
-            <p>Register Succesfully</p>
+            <p>Registered Succesfully</p>
             <p>Sign in <a href="/signin">here</a></p>
       `;
       console.log("footerResult:", footerResult);
@@ -170,6 +170,7 @@ fetch(userUrl, {
       // }, 1000); // Delay of 1 second before redirecting
     } else {
       alert(`${data.message}`)
+      form.reset();
     }
   })
   .catch((err) => {
