@@ -126,7 +126,7 @@ function createRouteCard(data) {
 
     const cardDetail = document.createElement('div');
     cardDetail.className = 'card-detail';
-    cardDetail.innerHTML = `<p><img src=/static/images/trash.svg>  ${daysLeft} days left </p><p><img src="/static/images/tick.svg">  ${data.done} people have done it</p>`;
+    cardDetail.innerHTML = `<p><img src=/static/images/trash.svg>  ${daysLeft} days left </p><p><img src="/static/images/tick.svg">  Done: ${data.done}</p>`;
 
     cardName.appendChild(cardDetail);
     cardWrap.appendChild(cardGrade);
@@ -180,10 +180,33 @@ function renderChart(routeData){
                 y: {
                     beginAtZero: true
                 }
+            },
+
+            onClick: function(event) {
+                const chart = this;
+                const activePoints = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+
+                if (activePoints.length > 0) {
+                    const index = activePoints[0].index;
+                    const label = labels[index];
+                    console.log(labels[index]);
+
+                    const inputField = document.querySelector(".route-search");
+                if (inputField) {
+                    inputField.value = label;
+                    keyword = label;
+                    page = 0;
+                    document.querySelector(".cards-wrap").innerHTML = ""; 
+                    getRoute(); 
+                }
+                
+                }
             }
         }
     });
 }
+
+
 
 
 
