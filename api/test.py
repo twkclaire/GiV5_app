@@ -7,7 +7,7 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 import time
 from database import cnxpool
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 
 
 load_dotenv() 
@@ -31,6 +31,8 @@ class PresignedUrlRequest(BaseModel):
     file_name: str
     content_type: str
     route_id:int
+    file_size: int
+    member_id:int
 
 class ProcessVideoRequest(BaseModel):
     route_id: int
@@ -43,6 +45,15 @@ class ProcessVideoRequest(BaseModel):
 async def create_presigned_url(request: PresignedUrlRequest):
     file_name = request.file_name
     content_type = request.content_type
+    file_size = request.file_size
+    member_id=request.member_id
+
+    MAX_FILE_SIZE_MB = 50
+    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    if file_size > MAX_FILE_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail=f"File size exceeds {MAX_FILE_SIZE_MB} MB limit")
+    
     print(f"file_name: {file_name}, content_type: {content_type}")
     try:
         unique_file_name = f"{uuid4()}-{file_name}"
@@ -56,7 +67,7 @@ async def create_presigned_url(request: PresignedUrlRequest):
             ExpiresIn=3600  #  expiration time 60 mins
         )
 
-        video_id = insert_initial_video_metadata(request.route_id, presigned_url)
+        video_id = insert_initial_video_metadata(request.route_id, presigned_url, member_id)
         if not video_id:
             raise HTTPException(status_code=500, detail="Error inserting video metadata")
         
@@ -102,15 +113,15 @@ async def get_video_status(video_id: int):
             cursor.close()
             db.close()
 
-def insert_initial_video_metadata(route_id, presigned_url):
+def insert_initial_video_metadata(route_id, presigned_url,member_id):
     try:
         db = cnxpool.get_connection()
         mycursor = db.cursor()
         sql = """
-        INSERT INTO video (route_id, mpd_url, upload_date, status, presigned_url)
-        VALUES (%s, 'waiting', NOW(), 'pending', %s)
+        INSERT INTO video (route_id, mpd_url, upload_date, status, presigned_url, member_id)
+        VALUES (%s, 'waiting', NOW(), 'pending', %s, %s)
         """
-        mycursor.execute(sql, (route_id, presigned_url))
+        mycursor.execute(sql, (route_id, presigned_url, member_id))
         db.commit()
         return mycursor.lastrowid  # Return the ID of the newly inserted record
     except Error as e:
