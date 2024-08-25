@@ -145,7 +145,8 @@ async def getMemberRoute(routeId:int):
 				m.height,
 				m.grade,
 				a.type,
-				a.date
+				a.date,
+                m.memberId  
 			FROM
 				achievement a
 			INNER JOIN
@@ -166,12 +167,14 @@ async def getMemberRoute(routeId:int):
             allMembers = []
             for result in results:
                 data = {
+                      
                     "name": result[0],
                     "gender": result[1],
                     "height": result[2],
                     "grade": result[3],
                     "type": result[4],
-                    "date": result[5]
+                    "date": result[5],
+                    "memberId":result[6]
                 }
                 allMembers.append(data)  # This should be inside the for loop
 
