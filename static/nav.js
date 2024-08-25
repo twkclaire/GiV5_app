@@ -23,7 +23,8 @@ window.onload = function checkSigninStatus() {
           userId=data.data.id
           console.log("is this the user id:",userId)
           content +=`
-                <a href="/member/${userId}"">My Page</a>
+                <a href="/member/${userId}">My Page</a>
+                <a href="/achievement/${userId}">My Achievements</a>
                 <a href="#" onclick="deleteToken(); return false;">Log out</a>
           `  
           dropdownContent.innerHTML += content;

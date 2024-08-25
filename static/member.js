@@ -27,15 +27,19 @@ window.onload = function checkSigninStatus() {
         })
         .then((data) => {
             userId=data.data.id
+            if (userId==memberId){
             console.log("Fetch successful:", data);
             document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
             userId=data.data.id
             console.log("is this the user id:",userId)
             content +=`
+                     <a href=/achievement/${userId}>My Achievements</a>
                     <a href="#" onclick="deleteToken(); return false;">Log out</a>
             `  
             dropdownContent.innerHTML += content;
-
+            }else{
+                window.location.href=`/member/${userId}`
+            }    
         })
         .catch((err) => {
           console.error("Error:", err.message);
@@ -91,7 +95,7 @@ function getSavedRoute() {
                     mainHTML += `
                         <div class="card-wrap" data-route-id="${route.routeId}" onclick="navigateToRoute(this)">
                             <a href="/route/${route.routeId}" class="card-link"></a>
-                            <div class="card-grade"><div>${route.routeGrade}</div></div>
+                            <div class="card-grade"><div class="grade-font">${route.routeGrade}</div></div>
                             <div class="card-name">
                                 <p>${route.routeId}. ${route.routeName}</p>
                                 <div class="card-detail">
