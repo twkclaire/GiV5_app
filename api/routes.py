@@ -60,12 +60,12 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
             LEFT JOIN 
                 achievement a ON r.routeId = a.routeId
             WHERE 
-                r.name LIKE %s OR r.routeId = %s
+                r.name LIKE %s OR r.routeId = %s OR r.grade=%s
             GROUP BY 
                 r.routeId
             LIMIT 9 OFFSET %s;
             """
-            sql_data=["%"+keyword+"%",keyword,start]
+            sql_data=["%"+keyword+"%",keyword, keyword,start]
             mycursor.execute(sql,sql_data)
             results=mycursor.fetchall()
             num_results=len(results)
