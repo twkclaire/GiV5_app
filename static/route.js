@@ -549,5 +549,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function navigateToRoute(memberId) {
-    window.location.href = `/achievement/${memberId}`;
+    const token = localStorage.getItem("token");
+    if (token){
+        window.location.href = `/achievement/${memberId}`;
+    }else{
+        alert("Please sign in to view other people's achievements.")
+    }
+    
 }
