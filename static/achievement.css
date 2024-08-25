@@ -165,7 +165,8 @@
 
 .achievement-details{
     display: flex;
-    gap:10px
+    gap:10px;
+    margin-top:10px
 }
 .route-name {
     font-size: 20px;
@@ -212,4 +213,21 @@
 .undo-btn:active {
     background-color: rgba(193, 28, 132, 0.6); /* Even lighter for active state */
     transform: scale(0.95);
+}
+
+
+@media (max-width: 480px) {
+    .achievement-card{
+        padding:10px
+    }
+
+    .achievement-grade{
+        width:40px;
+        height:40px;
+        font-size:1rem;
+    }
+    .undo-btn{
+        padding:12px;
+        font-size:0.8rem
+    }
 }

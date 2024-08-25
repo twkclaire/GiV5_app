@@ -179,3 +179,12 @@ canvas {
     gap: 10px;
 }
 
+@media (max-width: 850px) {
+    .chart-wrap, .search-wrap, .cards-wrap{
+        margin-left:10px;
+        margin-right:10px
+    }
+    .route-submit-btn{
+        margin-right:20px;
+    }
+}

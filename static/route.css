@@ -141,6 +141,7 @@ h1 {
     display: flex;
     margin-top: 5px;
     gap: 20px;
+    margin-top:10px;
 }
 
 /* button wrap */
@@ -406,4 +407,13 @@ video {
 
 .completed .loading-dots {
     display: none;
+}
+
+
+@media (max-width: 600px) {
+
+    .button-wrap, .route-card-wrap, .notification-wrap, .video-card-wrap, .done-list-wrap{
+        margin-left: 10px;
+        margin-right: 10px
+    }
 }

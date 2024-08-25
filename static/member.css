@@ -172,12 +172,14 @@ body {
     display: flex;
     justify-content: center;
     align-self: center;
+    align-items: center;
     color: white;
     background-color: black;
-    font-size: 1.5rem;
-    border-radius: 200px; 
-    flex-basis: 60px;
-    padding: 16px 0;
+    font-size: 2rem;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    /* border-radius: 200px;  */
 }
 
 .card-name {
@@ -242,7 +244,7 @@ body {
 
 /* The Charts */
 .wrapper {
-    width: 100%;
+    /* width: 100%; */
     max-width: 800px;
     margin: 0 auto;
     display: flex;
@@ -272,4 +274,36 @@ body {
 canvas {
     width: 100% !important;
     height: 100% !important;
+}
+
+
+@media (max-width: 850px) {
+    .personal-info-wrap, .save-title, .all-cards-wrap, .record-title, .wrapper{
+        margin-left:10px;
+        margin-right:10px
+    }
+}
+
+@media (max-width: 600px) {
+    .card-wrap{
+        gap:10px;
+        padding:10px;
+    }
+    .card-btn-wrap button{
+        padding:10px
+    } 
+    .card-btn-wrap{
+        gap:8px;
+    }
+    .card-grade{
+        font-size: 1rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+    }
+    .card-btn-wrap button:last-child img {
+        width:12px;
+        height:12px;
+    }
+    
 }
