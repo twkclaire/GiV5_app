@@ -1,3 +1,4 @@
+
 const path = window.location.pathname;
 const memberId = path.split('/')[2];
 const url = `api/achievement/${memberId}`;
@@ -30,12 +31,15 @@ window.onload = function checkSigninStatus() {
             userId=data.data.id
             console.log("is this the user id:",userId)
             content +=`
-                    <a href=/member/${userId}>My To do Routes</a>
+                    <a href=/member/${userId}>My Page</a>
                     <a href="#" onclick="deleteToken(); return false;">Log out</a>
             `  
             dropdownContent.innerHTML += content;
 
+            fetchAchievements();
+
         })
+        
         .catch((err) => {
           console.error("Error:", err.message);
         });
@@ -52,23 +56,33 @@ window.onload = function checkSigninStatus() {
 
 
 async function fetchAchievements() {
+    const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`/api/achievement/${memberId}`);
+        const response = await fetch(`/api/achievement/${memberId}`,{
+            method:"GET",
+            headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+            }
+        });
         const data = await response.json();
         console.log(data);
         if (data.error) {
             console.error(data.message);
             return;
         }
-        
-        renderAchievements(data.data);
+        console.log("this is username:",  data.name['username'])
+        renderAchievements(data.data, data.undo, data.name['username']);
     } catch (error) {
         console.error('Error fetching achievements:', error);
     }
 }
 
-function renderAchievements(achievements) {
+function renderAchievements(achievements, undo, name) {
     const container = document.getElementById('achievements-container');
+    const title = document.getElementById('achievements-title');
+    title.innerHTML = `<h2>Achievements for ${name}</h2>`;
+
 
     achievements.forEach(achievement => {
         const { routeId, name, grade, date, type } = achievement;
@@ -84,12 +98,12 @@ function renderAchievements(achievements) {
                         <p class="route-name">${routeId} ${name}</p>
                     </div>
                     <div class="achievement-details">
-                        <p class="achieve-date">Achieved on: ${new Date(date).toLocaleDateString()}</p>
+                        <p class="achieve-date">${new Date(date).toLocaleDateString()}</p>
                         <p class="achievement-type">${typeString}</p>
                     </div>
                 </div>
                 <div class="achievement-btn-wrap">
-                    <button class="undo-btn" onclick="deleteAchi(event, '${routeId}', this)">Undo</button>
+                   ${undo? `<button class="undo-btn" onclick="deleteAchi(event, '${routeId}', this)">Undo</button>`: ''}
                 </div>
             </div>
         `;
@@ -107,6 +121,11 @@ function navigateToRoute(element) {
 
 function deleteAchi(event, routeId, buttonElement) {
     event.stopPropagation(); // Prevent event bubbling
+
+    if (!confirm('Are you sure you want to undo this action?')) {
+        return; 
+    }
+
     const data = {
         memberId: memberId,
         routeId: routeId
@@ -139,6 +158,13 @@ function deleteAchi(event, routeId, buttonElement) {
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchAchievements(); 
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     fetchAchievements(); 
+// });
+
+function deleteToken() {
+    let token = localStorage.removeItem("token");
+    console.log("user signed out");
+    window.location.reload();
+    return token;
+  }
