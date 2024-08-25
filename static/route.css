@@ -170,6 +170,7 @@ button {
 
 }
 
+/* notification */
 .notification-wrap{
     display: flex;
     max-width: 800px;
@@ -177,16 +178,15 @@ button {
 
 }
 .notification{
-    color:pink;
-    position: fixed; /* Position the notification relative to the viewport */
-    top: 50px; /* Distance from the top of the viewport */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Center horizontally */
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-    color: white; /* Text color */
-    padding: 10px 20px; /* Padding */
-    border-radius: 5px; /* Rounded corners */
-    z-index: 1000; /* Ensure it's above other content */
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
 }
 
 button:hover {

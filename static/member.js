@@ -183,7 +183,7 @@ async function handleButtonClick(event, type, routeId) {
             if (response.ok) {
                 if (data.ok) {
                     console.log("Record created successfully");
-
+                    displayNotification("Congrats!")
                     // Update counts after successful record creation
                     const memberData = await getMemberData();
                     if (memberData) {
@@ -191,6 +191,7 @@ async function handleButtonClick(event, type, routeId) {
                     }
                 } else {
                     console.log("Record already exists!");
+                    displayNotification("Your record is changed");
                 }
             } else {
                 console.error('Response error:', data);
@@ -201,6 +202,15 @@ async function handleButtonClick(event, type, routeId) {
     } else {
         alert("Please log in first!");
     }
+}
+
+function displayNotification(message) {
+    const notification = document.getElementById("notification");
+    notification.innerText = message;
+    notification.style.display = "block";
+    setTimeout(() => {
+        notification.style.display = "none";
+    }, 3000); // Hide notification after 3 seconds
 }
 
 function getMemberData() {

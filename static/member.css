@@ -105,6 +105,26 @@ body {
 }
 
 
+/* notification */
+.notification-wrap{
+    display: flex;
+    max-width: 800px;
+    margin: 20px auto;
+
+}
+
+.notification {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
 .personal-info-wrap {
     display: flex;
     margin: 20px auto; 
