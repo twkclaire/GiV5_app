@@ -33,7 +33,8 @@ window.onload = function checkSigninStatus() {
             userId=data.data.id
             console.log("is this the user id:",userId)
             content +=`
-                     <a href=/achievement/${userId}>My Achievements</a>
+                    <a id="myButton" onclick="openPopup()">User Guide</a>
+                    <a href=/achievement/${userId}>Achievements</a>
                     <a href="#" onclick="deleteToken(); return false;">Log out</a>
             `  
             dropdownContent.innerHTML += content;
@@ -46,22 +47,32 @@ window.onload = function checkSigninStatus() {
         });
     } else {
       console.error("Token not found");
-      content +=`
-                <a href="/signin">Sign in</a>
-                <a href="/register">Sign up</a>
+      window.location.href="/";
+    //   content +=`
+    //             <a href="/signin">Sign in</a>
+    //             <a href="/register">Sign up</a>
 
-          `  
-          dropdownContent.innerHTML += content;
+    //       `  
+    //       dropdownContent.innerHTML += content;
     }
   };
 
   function deleteToken() {
     let token = localStorage.removeItem("token");
     console.log("user signed out");
-    window.location.reload();
+    window.location.href="/";
     return token;
   }
 
+  const closePopup = document.getElementById('closePopup');
+  const myPopup = document.getElementById('myPopup');  
+  function openPopup(){
+    myPopup.classList.add('show');
+  }
+
+  closePopup.addEventListener('click', function () {
+    myPopup.classList.remove('show');
+});
 
 
 
@@ -118,7 +129,7 @@ function getSavedRoute() {
             });
         }else{
             alert("please sign in!")
-            window.location.href ="/signin";
+            window.location.href="/";
         }        
 }
 
@@ -199,9 +210,10 @@ async function handleButtonClick(event, type, routeId) {
         } catch (error) {
             console.error('Fetch error:', error);
         }
-    } else {
-        alert("Please log in first!");
-    }
+    } 
+    // else {
+    //     alert("Please log in first!");
+    // }
 }
 
 function displayNotification(message) {
@@ -263,9 +275,10 @@ function getMemberData() {
             .catch(error => {
                 console.error('Error fetching member data:', error);
             });
-    }else{
-        alert("please sign in!")
-    }    
+    }
+    // else{
+    //     alert("please sign in!")
+    // }    
 }
 
 function updateCounts(flash, done) {
@@ -424,8 +437,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    }else{
-        alert("please log in first!")
-    }     
+    }
+    // else{
+    //     alert("please log in first!")
+    // }     
  });
 
