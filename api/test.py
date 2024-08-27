@@ -154,19 +154,34 @@ def process_video(route_id: int, file_key: str, video_id:int):
         if not os.path.exists(hls_dirpath):
             os.makedirs(hls_dirpath)
 
+        # the original ffmpeg
+        # ffmpeg_command = [
+        #     "ffmpeg", "-i", local_file_path,
+        #     "-map", "0:v", "-map", "0:v", "-map", "0:v", "-map", "0:v",  
+        #     "-map", "0:a",  
+        #     "-b:v:0", "300k",  
+        #     "-b:v:1", "600k",   
+        #     "-b:v:2", "1200k",  
+        #     "-b:v:3", "2400k",  
+        #     "-c:v", "libx264", "-preset", "veryfast",  
+        #     "-c:a", "copy", 
+        #     "-f", "dash",  
+        #     hls_filepath 
+        # ]
+
+
         ffmpeg_command = [
-            "ffmpeg", "-i", local_file_path,
-            "-map", "0:v", "-map", "0:v", "-map", "0:v", "-map", "0:v",  
-            "-map", "0:a",  
-            "-b:v:0", "300k",  
-            "-b:v:1", "600k",   
-            "-b:v:2", "1200k",  
-            "-b:v:3", "2400k",  
-            "-c:v", "libx264", "-preset", "veryfast",  
-            "-c:a", "copy", 
-            "-f", "dash",  
-            hls_filepath 
+            "ffmpeg", 
+            "-i", local_file_path,
+            "-map", "0:v:0", "-b:v:0", "300k",
+            "-map", "0:v:0", "-b:v:1", "600k",
+            "-map", "0:v:0", "-b:v:2", "1200k",
+            "-map", "0:v:0", "-b:v:3", "2400k",
+            "-map", "0:a:0", "-c:a", "aac", "-b:a", "128k",
+            "-c:v", "libx264", "-preset", "veryfast",
+            "-f", "dash", hls_filepath
         ]
+        
 
         subprocess.run(ffmpeg_command, check=True)
 
