@@ -34,6 +34,8 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
                 route r
             LEFT JOIN 
                 achievement a ON r.routeId = a.routeId
+            WHERE 
+                r.available = 1    
             GROUP BY 
                 r.routeId
             LIMIT 9 OFFSET %s;
@@ -60,7 +62,7 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
             LEFT JOIN 
                 achievement a ON r.routeId = a.routeId
             WHERE 
-                r.name LIKE %s OR r.routeId = %s OR r.grade=%s
+                r.available = 1 AND (r.name LIKE %s OR r.routeId = %s OR r.grade = %s)
             GROUP BY 
                 r.routeId
             LIMIT 9 OFFSET %s;
@@ -108,7 +110,7 @@ async def countRoutes():
     try:
         db =cnxpool.get_connection()
         mycursor = db.cursor()
-        sql ="SELECT grade, COUNT(*) AS count FROM route GROUP BY grade;"
+        sql ="SELECT grade, COUNT(*) AS count FROM route WHERE available=1 GROUP BY grade;"
         mycursor.execute(sql,)
         routes=mycursor.fetchall()
         print(routes)

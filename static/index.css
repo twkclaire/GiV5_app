@@ -92,6 +92,18 @@
 }
 
 /* chart */
+
+.chart-title {
+    margin: 40px auto;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-color);
+    padding-bottom: 10px;
+    position: relative;
+}
+
+
 .chart-wrap {
     margin: 50px auto;
     max-width: var(--containerWidth);
@@ -116,7 +128,7 @@ canvas {
 .search-wrap {
     display: flex;
     justify-content: center;
-    margin: 24px auto;
+    margin: 40px auto;
     max-width: var(--containerWidth);
     width: 100%;
 }

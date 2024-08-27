@@ -95,14 +95,6 @@ getRoute().then(() => {
 
 
 
-// function countDate(){
-//     const expiredDate = new Date("2024-09-10"); // Example date
-//     const today = new Date();
-//     const timeDiff = expiredDate - today;
-//     const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-//     console.log(daysLeft)
-// }
-
 function createRouteCard(data) {
     const expiredDate = new Date(`${data.expired}`); // Example date
     const today = new Date();
@@ -161,7 +153,7 @@ function renderChart(routeData){
         data: {
             labels: labels,
             datasets: [{
-                label: 'Route',
+                label: 'Available',
                 data: values,
                 backgroundColor: 'rgba(90, 90, 90, 1)',
                 borderColor: 'rgba(193,28,132, 1)',
@@ -205,8 +197,6 @@ function renderChart(routeData){
         }
     });
 }
-
-
 
 
 
