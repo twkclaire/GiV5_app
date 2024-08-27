@@ -1,11 +1,14 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
 :root {
     --primary-color: #333; 
+    --secondary: #333; 
+    --text-color: #333;
     --background-color: #f8f8f8;
     --container-bg: #fff; 
-    --text-color: #333;
     --inputBorderColor: lightgray; 
     --border-radius: 8px; 
     --shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    --containerWidth: 800px;
     --font-primary: "Poppins", sans-serif;
 }
 
@@ -108,7 +111,7 @@ body {
 /* notification */
 .notification-wrap{
     display: flex;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     margin: 20px auto;
 
 }
@@ -130,7 +133,7 @@ body {
     margin: 20px auto; 
     background-color: var(--container-bg); 
     gap: 20px;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     position: relative;
     padding: 20px;
     border-radius: var(--border-radius); 
@@ -172,7 +175,7 @@ body {
     margin: 20px auto;
     align-items: center;
     justify-content: center;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     flex-direction: column;
 }
 
@@ -265,7 +268,7 @@ body {
 /* The Charts */
 .wrapper {
     /* width: 100%; */
-    max-width: 800px;
+    max-width: var( --containerWidth);
     margin: 0 auto;
     display: flex;
     justify-content: space-between;

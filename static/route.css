@@ -1,19 +1,26 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
 
-* {
+:root {
+    --primary: #333; 
+    --secondary: rgba(193, 28, 132, 1); 
+    --text-color: #333;
+    --background-color: #f8f8f8;
+    --container-bg: #fff;
+    --inputBorderColor: lightgray;
+    --border-radius: 8px;
+    --shadow: 0 4px 8px rgba(0,0,0,0.1);   
+    --containerWidth: 800px;
+    --font-primary: "Poppins", sans-serif;
+
+}
+
+*{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-primary);
 }
 
-:root {
-    --primary: #333; 
-    --secondary: #333; 
-    --inputBorderColor: lightgray; 
-    --bgColor: #fff;
-    --containerWidth: 800px; 
-}
 body {
     margin: 0;
     padding: 0;
@@ -24,7 +31,7 @@ body {
 
 /* nav bar */
 .nav-bar {
-    background-color: var(--bgColor);
+    background-color: var(--container-bg);
     height: 64px;
     display: flex;
     justify-content: space-between;
@@ -114,11 +121,11 @@ h1 {
     justify-content: center;
     padding: 20px;
     gap: 20px;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     position: relative;
     margin: 20px auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
 }
 
 
@@ -147,17 +154,17 @@ h1 {
 /* button wrap */
 .button-wrap {
   display: flex;
-  max-width: 800px;
+  max-width: var( --containerWidth);
   justify-content: space-between;
   position: relative;
   margin: 30px auto;
 }
 
 button {
-  background-color: var(--secondary, #333); 
+  background-color: var(--primary); 
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   padding: 10px 20px;
   font-size: 16px;
   font-weight: 500;
@@ -173,7 +180,7 @@ button {
 /* notification */
 .notification-wrap{
     display: flex;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     margin: 20px auto;
 
 }
@@ -185,7 +192,7 @@ button {
     background-color: rgba(0, 0, 0, 0.6);
     color: white;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     z-index: 1000;
 }
 
@@ -204,7 +211,7 @@ button:active {
 /* beta bar */
 .beta-wrap {
     display: flex;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     margin: 40px auto;
     justify-content: space-between;
     align-items: center;
@@ -238,14 +245,14 @@ video {
     margin: 20px auto;
     align-items: center;
     justify-content: center;
-    max-width: 800px; 
+    max-width: var( --containerWidth); 
 }
 
 .video-wrap {
     display: flex;
     width: 100%;
     height: 400px;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     background-color: black;
     margin: 0 10px; 
     align-items: center;
@@ -286,7 +293,7 @@ video {
 .video-image-wrap {
     display: none;
     height: 400px;
-    max-width: 800px;
+    max-width: var( --containerWidth);
     position: relative;
     margin: 20px auto;
 }
@@ -306,7 +313,7 @@ video {
 
 /* user card */
 .done-list-wrap {
-    max-width: 800px;
+    max-width: var( --containerWidth);
     margin: 60px auto;
 }
 
@@ -319,12 +326,12 @@ video {
 .user-card-wrap {
     background-color: #fff;
     border: 1px solid var(--inputBorderColor);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     display: flex;
     padding: 10px 20px;
     gap: 20px;
     margin: 24px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     align-items: center;
     cursor: pointer;
 }

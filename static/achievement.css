@@ -1,24 +1,23 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
+:root {
+    --primary: #333;
+    --secondary: rgba(193, 28, 132, 1);
+    --text-color: #333;
+    --container-bg: #fff;
+    --inputBorderColor: lightgray;
+    --border-radius: 8px;
+    --shadow: 0 4px 8px rgba(0,0,0,0.1);   
+    --containerWidth: 800px; 
+    --font-primary: "Poppins", sans-serif; 
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: var(--font-primary);
 }
-
-:root {
-    --primary: #333;
-    --secondary: rgba(193, 28, 132, 1);
-    --inputBorderColor: lightgray; 
-    --bgColor: #fff;
-    --containerWidth: 800px; 
-    --container-bg: #fff;
-    --font-primary: "Poppins", sans-serif; 
-}
-
-
-
 .nav-bar {
-    /* background-color: var(--bgColor);  */
     height: 64px;
     display: flex;
     justify-content: space-between;
@@ -102,7 +101,7 @@
     text-align: center;
     font-size: 28px;
     font-weight: 700;
-    color: #333;
+    color: var(--text-color);
     padding-bottom: 10px;
     position: relative;
 }
@@ -114,7 +113,7 @@
 
 /* Wrapper for Achievement Cards */
 .achievements-wrap {
-    max-width: 800px;
+    max-width: var( --containerWidth);
     margin: 0 auto;
     padding: 20px;
 }
@@ -160,7 +159,7 @@
     flex-direction: column;
     flex: 1;
     margin-left: 20px;
-    color: #333;
+    color: var(--text-color);
 }
 
 .achievement-details{
@@ -203,7 +202,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow);
 }
 
 .undo-btn:hover {

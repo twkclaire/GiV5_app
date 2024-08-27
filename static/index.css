@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +8,7 @@
 
 :root {
     --primary: #333; 
-    --secondary: #333; 
+    --secondary:rgba(193, 28, 132, 1); 
     --inputBorderColor: lightgray; 
     --containerWidth: 800px; 
 }
@@ -131,7 +132,7 @@ canvas {
 .route-submit-btn {
     border-radius: 0 5px 5px 0;
     border: 1px solid var(--inputBorderColor);
-    background-color: var(--secondary);
+    background-color: var(--primary);
     color: #fff;
     padding: 12px 20px;
     font-size: 16px;
