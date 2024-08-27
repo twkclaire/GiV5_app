@@ -4,10 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/member.css">
+    <link rel="stylesheet" href="/static/popupbox.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Member Page</title>
 </head>
 <body>
+    <div id="myPopup" class="popup">
+        <div class="popup-content">
+                <div class="popup-title">
+                    <h1 class="guide-title">User Guide</h1>
+                </div>
+                <hr class="title-content-sep">
+                <div class="guide-type">
+                    <h2 class="ex-title">Loggin explain</h2>
+                    <div class="log-exp-wrap">
+                        <p class="log-type">Save:</p>
+                        <p class="log-ex">Save a route in your to do list to help you keep track of your projects.</p>
+                    </div>
+                    <div class="log-exp-wrap">
+                        <p class="log-type">Flash:</p>
+                        <p class="log-ex">You finished the route on your first try.</p>
+                    </div>
+                    <div class="log-exp-wrap">
+                        <p class="log-type">Done:</p>
+                        <p class="log-ex">You successfully climbed the route with multiple tries.</p>
+                    </div>
+                </div>
+                <div class="guide-q">
+                    <h2 class="ex-title">Frequently asked questions</h2>
+                    <p class="guide-ask">Q: I saved a route, where do I see it?</p>
+                    <p class="guide-ans">A: Check out my page, where you can find a list of routes you saved.</p>
+    
+                    <p class="guide-ask">Q: Oops I accidentally clicked the flash/done button, can I undo it?</p>
+                    <p class="guide-ans">A: Yes! You can undo this record at your achievements page.</p>
+                </div>
+    
+    
+                <button id="closePopup">
+                    Got it!
+                </button>
+        </div>
+    </div>
     <div class="nav-bar">
         <div class="nav-logo-wrap">
           <a href="/">  
