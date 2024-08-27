@@ -14,13 +14,13 @@ submitBtn.addEventListener("click", function(event) {
 
     // Check if both fields are filled
     if (emailInput.value.trim() === "" || passwordInput.value.trim() === "") {
-        console.error("Please fill in all fields.");
+        alert("Please fill in all fields.");
         return; 
     }
 
     // Validate the email format
     if (!isValidEmail(emailInput.value.trim())) {
-        console.error("Invalid email format.");
+        alert("Invalid email format.");
         return; 
     }
 
