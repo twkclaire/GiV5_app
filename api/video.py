@@ -31,7 +31,7 @@ s3_client = boto3.client('s3',
 CLOUDFRONT_DOMAIN = 'd2jdt95w56fzkq.cloudfront.net'
 
 
-VIDEO_SERVICE_URL = "http://18.193.82.8:8000"  # Your video app URL
+VIDEO_SERVICE_URL = "http://3.67.76.85:8000"  # Your video app URL
 
 class PresignedUrlRequest(BaseModel):
     file_name: str
@@ -83,6 +83,7 @@ async def forward_video_status(video_id: int):
             return response.json()
         else:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail", "Error"))
+
 
 # def insert_video_metadata(route_id, mpd_url, member_id=None):
 #     try:
