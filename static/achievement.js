@@ -31,6 +31,7 @@ window.onload = function checkSigninStatus() {
             userId=data.data.id
             console.log("is this the user id:",userId)
             content +=`
+                    <a id="myButton" onclick="openPopup()">User Guide</a>
                     <a href=/member/${userId}>My Page</a>
                     <a href="#" onclick="deleteToken(); return false;">Log out</a>
             `  
@@ -54,6 +55,15 @@ window.onload = function checkSigninStatus() {
   };
 
 
+  const closePopup = document.getElementById('closePopup');
+  const myPopup = document.getElementById('myPopup');  
+  function openPopup(){
+    myPopup.classList.add('show');
+  }
+
+  closePopup.addEventListener('click', function () {
+    myPopup.classList.remove('show');
+});
 
 async function fetchAchievements() {
     const token = localStorage.getItem("token");
@@ -85,10 +95,12 @@ function renderAchievements(achievements, undo, name) {
 
 
     achievements.forEach(achievement => {
-        const { routeId, name, grade, date, type } = achievement;
+        const { routeId, name, grade, date, type, available } = achievement;
 
         // Convert type (0 or 1) to string
         const typeString = type === 0 ? 'Flash' : 'Done'; 
+
+        const showUndoButton = undo && available === 1;
 
         const cardHTML = `
             <div class="achievement-card" data-route-id=${routeId} onclick="navigateToRoute(this)">
@@ -103,7 +115,7 @@ function renderAchievements(achievements, undo, name) {
                     </div>
                 </div>
                 <div class="achievement-btn-wrap">
-                   ${undo? `<button class="undo-btn" onclick="deleteAchi(event, '${routeId}', this)">Undo</button>`: ''}
+                    ${showUndoButton ? `<button class="undo-btn" onclick="deleteAchi(event, '${routeId}', this)">Undo</button>` : ''}
                 </div>
             </div>
         `;
@@ -117,8 +129,9 @@ function navigateToRoute(element) {
     window.location.href = `/route/${routeId}`;
 }
 
-//delete button
 
+
+//delete button
 function deleteAchi(event, routeId, buttonElement) {
     event.stopPropagation(); // Prevent event bubbling
 
@@ -158,13 +171,9 @@ function deleteAchi(event, routeId, buttonElement) {
 
 
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     fetchAchievements(); 
-// });
-
 function deleteToken() {
     let token = localStorage.removeItem("token");
     console.log("user signed out");
-    window.location.reload();
+    window.location.href="/";
     return token;
   }
