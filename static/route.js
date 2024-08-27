@@ -143,66 +143,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-
-// this is my coddddd// this is my coddddd// this is my coddddd// this is my coddddd
-// fetching video
-
-// function getVideo(){
-//   fetch(videourl)
-//   .then(response => response.json())
-//   .then(data => {
-//     console.log("am I successful fetching video??",data)
-//       if (data.videos.length === 0) {
-//           // Display "add a video" image or message
-//           document.querySelector('.video-wrap').classList.remove('show');
-//           document.querySelector('.video-image-wrap').classList.add('show');
-//           console.log("Video wrap classes:", document.querySelector('.video-wrap').className);
-//           console.log("Image wrap classes:", document.querySelector('.video-image-wrap').className);
-//           console.log("we have no video found")
-
-//       } else {
-//           // Display the videos
-//           document.querySelector('.video-wrap').classList.add('show');
-//           document.querySelector('.video-image-wrap').classList.remove('show');
-//           let Url=data.videos[0].mpd_url
-//           initApp(Url)
-//           console.log("we found some videos")
-
-//       }
-//   })
-//   .catch(error => {
-//       console.error('Error fetching videos:', error);
-//   });
-// }
-// getVideo()
-
-
-// initialising player
-// async function initApp(url) {
-//         shaka.polyfill.installAll();
-//         if (shaka.Player.isBrowserSupported()) {
-//             playVideo(url);
-//         } else {
-//             console.error('Browser not supported!');
-//         }
-//     }
-
-
-// async function playVideo(url) {
-//         const videoElement = document.getElementById('video');
-//         const player = new shaka.Player(videoElement);
-
-//         try {
-//             await player.load(url);
-//             console.log('The video has now been loaded and is playing!');
-//         } catch (error) {
-
-//             console.log(error);
-//         }
-//     }
-
-
-
 getData()
 
 
@@ -291,6 +231,8 @@ document.getElementById("videoInput").addEventListener("change", async function(
             displayNotification("Video uploaded. Stay on the page to process the video!");
             // displayStatus("initiating")
 
+            displayStatus("checking")
+
             // alert("Video uploaded and processing started successfully!");
 
             // Step 4: Polling to check video process status 
@@ -299,6 +241,8 @@ document.getElementById("videoInput").addEventListener("change", async function(
                     console.error("videoId is not defined");
                     return; // Exit if videoId is not valid                
                 }
+
+                
                 try {
                     const statusResponse = await fetch(`/api/route/video-status/${videoId}`);
                     if (!statusResponse.ok) {
@@ -357,10 +301,10 @@ function displayStatus(message) {
         statusUpdate.classList.remove("processing");
         statusUpdate.innerHTML = 'Video processing status: Completed';
         loaderContainer.style.display = "none"; // Hide loader
-    } else if(message === "initiating"){
+    } else if(message === "checking"){
         statusUpdate.style.display = "block";
         statusUpdate.classList.add("processing");
-        statusUpdate.innerHTML = 'Video processing status: Initiating';
+        statusUpdate.innerHTML = 'Video processing status: Checking';
         loaderContainer.style.display = "block"; 
     }
 }
