@@ -23,8 +23,9 @@ window.onload = function checkSigninStatus() {
           userId=data.data.id
           console.log("is this the user id:",userId)
           content +=`
+                <a id="myButton" onclick="openPopup()">User Guide</a> 
                 <a href="/member/${userId}">My Page</a>
-                <a href="/achievement/${userId}">My Achievements</a>
+                <a href="/achievement/${userId}">Achievements</a>
                 <a href="#" onclick="deleteToken(); return false;">Log out</a>
           `  
           dropdownContent.innerHTML += content;
@@ -49,3 +50,14 @@ window.onload = function checkSigninStatus() {
     window.location.reload();
     return token;
   }
+
+  const closePopup = document.getElementById('closePopup');
+  const myPopup = document.getElementById('myPopup');  
+  function openPopup(){
+    myPopup.classList.add('show');
+  }
+
+  closePopup.addEventListener('click', function () {
+    myPopup.classList.remove('show');
+});
+ 
