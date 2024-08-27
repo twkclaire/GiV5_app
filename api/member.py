@@ -9,6 +9,7 @@ import jwt
 from datetime import date
 import time 
 from typing import Dict
+from fastapi.responses import RedirectResponse
 
 router=APIRouter()
 
@@ -208,8 +209,7 @@ async def getMemberRoute(memberId:int, token: dict = Depends(decodeJWT)):
     
     frontend_memberId=token["id"]
     if frontend_memberId != memberId:
-          raise HTTPException(status_code=403, detail="Access forbidden")
-
+          return RedirectResponse(url=f"/member/{frontend_memberId}")
     try:
         db =cnxpool.get_connection()
         mycursor = db.cursor()
