@@ -106,6 +106,10 @@
     position: relative;
 }
 
+.no-record{
+    position: relative;
+    text-align: center;
+}
 /* Remove underline effect */
 .achievements-title::after {
     content: none; /* Remove the underline effect */

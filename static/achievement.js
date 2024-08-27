@@ -92,6 +92,10 @@ function renderAchievements(achievements, undo, name) {
     const container = document.getElementById('achievements-container');
     const title = document.getElementById('achievements-title');
     title.innerHTML = `<h2>Achievements for ${name}</h2>`;
+    if (!achievements || achievements.length === 0) {
+        container.innerHTML = '<p class="no-record">No record yet!</p>';
+        return;
+    }
 
 
     achievements.forEach(achievement => {
@@ -159,7 +163,7 @@ function deleteAchi(event, routeId, buttonElement) {
         }
     })
     .then(() => {
-        // Remove the card from the UI
+ 
         buttonElement.closest('.achievement-card').remove();
     })
     .catch(error => {
