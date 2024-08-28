@@ -2,14 +2,6 @@ from mysql.connector.pooling import MySQLConnectionPool
 from dotenv import load_dotenv
 import os
 
-# dbconfig = {
-#     "host": "localhost",
-#     "user": "root",
-#     "password": "jmhg42thSQL!",
-#     "database": "component"
-# }
-
-# load_dotenv() 
 
 dbconfig = {
     "host": os.getenv("DB_HOST"),
