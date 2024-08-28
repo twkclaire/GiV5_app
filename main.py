@@ -39,13 +39,13 @@ async def video(request: Request):
 	return FileResponse("./templates/signin.html", media_type="text/html")
 
 
-@app.get("/test", include_in_schema=False)
-async def video(request: Request):
-	return FileResponse("./templates/test.html", media_type="text/html")
+# @app.get("/test", include_in_schema=False)
+# async def video(request: Request):
+# 	return FileResponse("./templates/test.html", media_type="text/html")
 
-@app.get("/test_admin", include_in_schema=False)
-async def video(request: Request):
-	return FileResponse("./templates/test_admin.html", media_type="text/html")
+# @app.get("/test_admin", include_in_schema=False)
+# async def video(request: Request):
+# 	return FileResponse("./templates/test_admin.html", media_type="text/html")
 
 
 ##compontnet that shouldn't be a page itself
