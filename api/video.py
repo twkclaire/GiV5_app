@@ -20,7 +20,7 @@ s3_client = boto3.client('s3',
 CLOUDFRONT_DOMAIN = 'd2jdt95w56fzkq.cloudfront.net'
 
 
-VIDEO_SERVICE_URL = "http://3.67.76.85:8000"  # Your video app URL
+VIDEO_SERVICE_URL = "http://3.67.76.85:8000" #video app IP
 
 class PresignedUrlRequest(BaseModel):
     file_name: str
