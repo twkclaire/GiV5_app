@@ -31,6 +31,11 @@ class UserSignup(BaseModel):
 	height: int
 	grade:str
 
+
+class DeleteAchievementRequest(BaseModel):
+    memberId: int
+    routeId: int      
+
 def token_response(token: str):
     return {
         "token": token
@@ -70,7 +75,7 @@ def decodeJWT(request: Request):
 
 
 #用戶註冊
-@router.post("/api/user", tags=["Member"])
+@router.post("/api/user", tags=["Auth"])
 async def registerUser(user:UserSignup):
 	try: 
 		db =cnxpool.get_connection()
@@ -99,7 +104,7 @@ async def registerUser(user:UserSignup):
 
 
 #用戶登入
-@router.put("/api/user/auth", tags=["Member"])
+@router.put("/api/user/auth", tags=["Auth"])
 async def login(user:UserLogIn):
 		print(user)
 		try: 
@@ -138,12 +143,11 @@ async def login(user:UserLogIn):
 			db.close()
 			
             
-@router.get("/api/user/auth" , tags=["Member"])
+@router.get("/api/user/auth" , tags=["Auth"])
 async def getUser(token:dict =Depends(decodeJWT)):
 	if isinstance(token, JSONResponse):
 		return token
 	return { "data": dict(list(token.items())[0: 3]) } #Using slicing on dictionary item list so expiry date isn't included
-
 
 
 
@@ -262,7 +266,8 @@ async def getMemberRoute(memberId:int, token: dict = Depends(decodeJWT)):
             db.close()    
 
 
-@router.get("/api/data/{memberId}")
+#member info
+@router.get("/api/data/{memberId}", tags=["Member"])
 async def get_member_data(memberId: int, token: dict = Depends(decodeJWT)):
     if isinstance(token, JSONResponse):
           return token
@@ -320,7 +325,7 @@ async def get_member_data(memberId: int, token: dict = Depends(decodeJWT)):
             }
 
         # Ensure all expected grades are included
-        expected_grades = [f"V{i}" for i in range(1, 10)]  # Adjust based on your actual grade range
+        expected_grades = [f"V{i}" for i in range(1, 9)]  
         for grade in expected_grades:
             if grade not in all_time_data:
                 all_time_data[grade] = {"flash": 0, "done": 0}
@@ -401,11 +406,6 @@ async def get_member_achievement(memberId: int, token:dict = Depends(decodeJWT))
             mycursor.close()
             db.close()
 
-
-
-class DeleteAchievementRequest(BaseModel):
-    memberId: int
-    routeId: int
 
 @router.delete("/api/achievement/delete", tags=["achievement"])
 async def delete_achievement(request: DeleteAchievementRequest):

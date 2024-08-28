@@ -34,7 +34,7 @@ class ProcessVideoRequest(BaseModel):
     file_key: str
     video_id: int
 
-@router.post("/api/route/presigned-url")
+@router.post("/api/route/presigned-url", tags=["Video"])
 async def forward_presigned_url(request: PresignedUrlRequest):
     data = {
         "file_name": request.file_name,
@@ -50,7 +50,7 @@ async def forward_presigned_url(request: PresignedUrlRequest):
         else:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail", "Error"))
 
-@router.post("/api/route/process-video")
+@router.post("/api/route/process-video",tags=["Video"])
 async def forward_process_video(request: ProcessVideoRequest):
     data = {
         "route_id": request.route_id,
@@ -64,7 +64,7 @@ async def forward_process_video(request: ProcessVideoRequest):
         else:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail", "Error"))
 
-@router.get("/api/route/video-status/{video_id}")
+@router.get("/api/route/video-status/{video_id}",tags=["Video"])
 async def forward_video_status(video_id: int):
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{VIDEO_SERVICE_URL}/api/route/video-status/{video_id}")
