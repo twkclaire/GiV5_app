@@ -2,20 +2,22 @@ from fastapi import *
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from database import cnxpool
-from enum import Enum
 from passlib.context import CryptContext
-from typing import Optional
 import jwt
-from datetime import date
 import time 
 from typing import Dict
 from fastapi.responses import RedirectResponse
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 router=APIRouter()
 
 
 bcrypt_context =CryptContext(schemes =["bcrypt"], deprecated="auto")
-JWT_SECRET = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+JWT_SECRET = os.getenv("JWT_SECRET")
+if not JWT_SECRET:
+    raise EnvironmentError("JWT_SECRET environment variable not set.")
 JWT_ALGORITHM = "HS256"		
 
 
