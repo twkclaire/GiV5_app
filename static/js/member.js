@@ -171,6 +171,7 @@ function deleteRoute(event, routeId, buttonElement) {
 }
 
 async function handleButtonClick(event, type, routeId) {
+    
     event.stopPropagation(); // Prevent event bubbling
     const token = localStorage.getItem("token");
 
@@ -180,6 +181,7 @@ async function handleButtonClick(event, type, routeId) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     memberId: memberId,

@@ -328,6 +328,7 @@ function handleSave() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`                        
                     },
                     body: JSON.stringify({
                         memberId: userId,  
@@ -380,6 +381,7 @@ async function handleButtonClick(type) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         memberId: userId,

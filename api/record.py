@@ -5,7 +5,7 @@ from database import cnxpool
 from typing import Optional
 from datetime import date
 from mysql.connector import Error
-
+from api.auth import decodeJWT
 
 router=APIRouter()
 
@@ -26,14 +26,17 @@ class DoneRoute(BaseModel):
 	completed_date:Optional[date]=None
 
 @router.post("/api/save", tags=["Record"])
-async def savedRoute(route:RouteSave):
+async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
+	if isinstance(token,JSONResponse):
+		return token
+      
 	try: 
 		db =cnxpool.get_connection()
 		mycursor = db.cursor()
 		sql_check="""
 		SELECT * FROM savedRoute WHERE memberId=%s AND routeId=%s 
 		"""
-		val_check=(route.memberId, route.routeId)
+		val_check=(token["id"], route.routeId)
 		mycursor.execute(sql_check,val_check)
 		result=mycursor.fetchone()
 		if result is None:
@@ -41,7 +44,7 @@ async def savedRoute(route:RouteSave):
 			INSERT INTO savedRoute (memberId, routeId)
 			VALUES (%s, %s)
 			"""
-			val=(route.memberId, route.routeId)
+			val=(token["id"], route.routeId)
 			mycursor.execute(sql,val)
 			db.commit()
 			return {"ok":True}
@@ -92,15 +95,19 @@ async def deleteSavedRoute(route: DeleteRoute):
 
 
 @router.post("/api/done",tags=["Record"])
-async def routeDone(done:DoneRoute):
-	print("this is what I got from the front:",done)
+async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
+	print("this is what I got from the front:",done)  
+	if isinstance(token,JSONResponse):
+		return token
+      
+        
 	try: 
 		db =cnxpool.get_connection()
 		mycursor = db.cursor()
 		sql_check="""
 		SELECT * FROM achievement WHERE memberId=%s AND routeId=%s 
 		"""
-		val_check=(done.memberId, done.routeId)
+		val_check=(token["id"], done.routeId)
 		mycursor.execute(sql_check,val_check)
 		result=mycursor.fetchone()
 		if result is None:
@@ -108,7 +115,7 @@ async def routeDone(done:DoneRoute):
 			INSERT INTO achievement (memberId, routeId, type)
 			VALUES (%s, %s, %s)
 			"""
-			val=(done.memberId, done.routeId, done.type)
+			val=(token["id"], done.routeId, done.type)
 			mycursor.execute(sql,val)
 			db.commit()
 
@@ -119,7 +126,7 @@ async def routeDone(done:DoneRoute):
             SET type =%s
             WHERE routeId=%s AND memberId=%s      
 			"""
-			val=(done.type, done.routeId, done.memberId)
+			val=(done.type, done.routeId, token["id"])
 			mycursor.execute(sql,val)
 			db.commit()
                               

@@ -7,7 +7,7 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 import time
 from database import cnxpool
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 
 
 load_dotenv() 

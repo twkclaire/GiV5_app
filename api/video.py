@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import httpx
 import logging
+from api.auth import decodeJWT
 
 logging.basicConfig(level=logging.DEBUG)
 
