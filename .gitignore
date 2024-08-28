@@ -6,3 +6,4 @@ myenv/
 .dockerignore
 templates/test_admin.html
 templates/test.html
+.DS_Store
