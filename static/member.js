@@ -1,4 +1,3 @@
-
 const path = window.location.pathname;
 const memberId = path.split('/')[2];
 const url = `/api/member/${memberId}`;

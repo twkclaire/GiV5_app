@@ -1,38 +1,3 @@
-
-
-// window.onload = function checkSigninStatus() {
-//   const token = localStorage.getItem("token");
-
-//   if (token) {
-//     fetch("/api/user/auth", {
-//       method: "GET",
-//       headers: { Authorization: `Bearer ${token}` },
-//     })
-//       .then((resp) => {
-//         if (!resp.ok) {
-//           return resp.json().then((data) => {
-//             throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
-//           });
-//         }
-//         return resp.json();
-//       })
-//       .then((data) => {
-//         console.log("Fetch successful:", data);
-//         // Dispatch the userSignedIn event only if the user is successfully authenticated
-//         document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
-//         window.location.href = "/"
-//       })
-//       .catch((err) => {
-//         console.error("Error:", err.message);
-//       });
-//   } else {
-//     console.error("Token not found");
-//   }
-// };
-
-
-
-
 initMultiStepForm();
 
 function initMultiStepForm() {
@@ -164,10 +129,6 @@ fetch(userUrl, {
       console.log("footerResult:", footerResult);
       form.reset();
 
-      // alert("Register Successfully. Please sign in!");
-      // setTimeout(() => {
-      //   window.location.href = "/signin";
-      // }, 1000); // Delay of 1 second before redirecting
     } else {
       alert(`${data.message}`)
       form.reset();
