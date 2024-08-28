@@ -365,11 +365,6 @@ function displayNotification(message) {
     }, 3000); // Hide notification after 3 seconds
 }
 
-// function displayStatus(message) {
-//     const statusUpdate = document.getElementById("status-update");
-//     statusUpdate.innerText = `Video processing status: ${message} `;
-//     statusUpdate.style.display = "block";
-// }
 
 
 

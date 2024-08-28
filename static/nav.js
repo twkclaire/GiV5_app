@@ -32,6 +32,12 @@ window.onload = function checkSigninStatus() {
         })
         .catch((err) => {
           console.error("Error:", err.message);
+          content +=`
+                <a href="/signin">Sign in</a>
+                <a href="/register">Sign up</a>
+            `  
+          dropdownContent.innerHTML += content;
+          
         });
     } else {
       console.error("Token not found");

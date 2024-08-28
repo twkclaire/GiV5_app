@@ -41,7 +41,7 @@ def signJWT(id: str, name:str, email:str) -> Dict[str, str]:
 		"id":id,
         "name": name,
 		"email":email,
-        "exp": time.time() + 86400 #expire in 1 day
+        "exp": time.time() +  30 * 86400 #expire in 30 day
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -62,7 +62,7 @@ def decodeJWT(request: Request):
             decoded_jwt = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
             return decoded_jwt
         except jwt.ExpiredSignatureError:
-            return JSONResponse(status_code=400, content={"error": True, "message": "Token expired"})
+            return JSONResponse(status_code=400, content={"error": True, "message": "Token expired, please sign in again"})
         except jwt.InvalidTokenError:
             return JSONResponse(status_code=400, content={"error": True, "message": "Invalid Token"})
     else:

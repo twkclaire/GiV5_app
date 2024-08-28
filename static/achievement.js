@@ -19,7 +19,7 @@ window.onload = function checkSigninStatus() {
         .then((resp) => {
           if (!resp.ok) {
             return resp.json().then((data) => {
-              throw new Error(`HTTP error! Status: ${resp.status}, Message: ${data.detail}`);
+              throw new Error(`Error: ${data.message}`);
             });
           }
           return resp.json();
@@ -30,19 +30,32 @@ window.onload = function checkSigninStatus() {
             document.dispatchEvent(new CustomEvent('userSignedIn', { detail: data.data.name }));
             userId=data.data.id
             console.log("is this the user id:",userId)
-            content +=`
-                    <a id="myButton" onclick="openPopup()">User Guide</a>
-                    <a href=/member/${userId}>My Page</a>
-                    <a href="#" onclick="deleteToken(); return false;">Log out</a>
-            `  
-            dropdownContent.innerHTML += content;
+            if (userId == memberId){ //user on their own page
+                content +=`
+                        <a id="myButton" onclick="openPopup()">User Guide</a>
+                        <a href=/member/${userId}>My Page</a>
+                        <a href="#" onclick="deleteToken(); return false;">Log out</a>
+                `  
+                dropdownContent.innerHTML += content;
+            }else{ //user view others, so show a path to their own achivment page
+                content +=`
+                <a id="myButton" onclick="openPopup()">User Guide</a>
+                <a href=/member/${userId}>My Page</a>
+                <a href=/achievement/${userId}>Achievements</a>
+                <a href="#" onclick="deleteToken(); return false;">Log out</a>
+        `  
+                dropdownContent.innerHTML += content;
+            }
 
             fetchAchievements();
 
         })
         
         .catch((err) => {
-          console.error("Error:", err.message);
+          alert(err.message);
+          deleteToken()
+        //   window.location.href ="/"
+          
         });
     } else {
       console.error("Token not found");
