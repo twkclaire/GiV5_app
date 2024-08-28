@@ -150,6 +150,7 @@ function navigateToRoute(element) {
 
 //delete button
 function deleteAchi(event, routeId, buttonElement) {
+    const token = localStorage.getItem("token");
     event.stopPropagation(); // Prevent event bubbling
 
     if (!confirm('Are you sure you want to undo this action?')) {
@@ -163,7 +164,10 @@ function deleteAchi(event, routeId, buttonElement) {
 
     fetch('/api/achievement/delete', {
         method: 'DELETE',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+             Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify(data)
     })
     .then(response => {
@@ -176,8 +180,14 @@ function deleteAchi(event, routeId, buttonElement) {
         }
     })
     .then(() => {
+        const achievementCard = buttonElement.closest('.achievement-card');
+        achievementCard.style.transition = 'opacity 0.5s ease';
+        achievementCard.style.opacity = '0';
+        setTimeout(() => {
+            achievementCard.remove();
+        }, 500);
  
-        buttonElement.closest('.achievement-card').remove();
+        // buttonElement.closest('.achievement-card').remove();
     })
     .catch(error => {
         console.error('Error:', error);

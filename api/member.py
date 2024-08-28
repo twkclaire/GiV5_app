@@ -31,10 +31,7 @@ class UserSignup(BaseModel):
 	height: int
 	grade:str
 
-
-class DeleteAchievementRequest(BaseModel):
-    memberId: int
-    routeId: int      
+   
 
 def token_response(token: str):
     return {
@@ -407,8 +404,15 @@ async def get_member_achievement(memberId: int, token:dict = Depends(decodeJWT))
             db.close()
 
 
+class DeleteAchievementRequest(BaseModel):
+    memberId: int
+    routeId: int   
+
 @router.delete("/api/achievement/delete", tags=["achievement"])
-async def delete_achievement(request: DeleteAchievementRequest):
+async def delete_achievement(request: DeleteAchievementRequest, token:dict = Depends(decodeJWT)):
+    if isinstance(token, JSONResponse):
+      return token
+    
     memberId = request.memberId
     routeId = request.routeId
     print("I got these from front end:", memberId, routeId)
