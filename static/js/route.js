@@ -33,7 +33,14 @@ function getData(){
       const expiredDate = new Date(`${data.expired}`); // Example date
       const today = new Date();
       const timeDiff = expiredDate - today;
-      const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+      const days=Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+      let daysLeft="Not available amymore"
+      if (data.available==1){
+         daysLeft = `${days} days left`;
+      }
+  
+      
+      
       
       main +=`
           <div class="route-card-grade" id="route_grade">${grade}</div>
@@ -44,12 +51,19 @@ function getData(){
               <div class="route-card-detail">
                 <p id="route_sent">${data.flash} Flash</p>
                 <p id="route_done">${data.done} Done</p>
-                <p id="route_delete"><img src="/static/images/trash.svg">  ${daysLeft} days left</p>
+                <p id="route_delete"><img src="/static/images/trash.svg">  ${daysLeft}</p>
               </div>
             </div> 
       `
 
       routeCardWrap.innerHTML += main; 
+
+      if (data.available ==1){
+        document.querySelector(".button-wrap").style.display="flex"
+        console.log("available is 1")
+        document.getElementById("uploadButton").style.display="flex"
+
+      }
       
     })
 
