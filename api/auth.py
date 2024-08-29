@@ -71,7 +71,7 @@ def decodeJWT(request: Request):
         except jwt.InvalidTokenError:
             return JSONResponse(status_code=400, content={"error": True, "message": "Invalid Token"})
     else:
-        return JSONResponse(status_code=403, content={"error": True, "message": "未登入系統，拒絕存取"})
+        return JSONResponse(status_code=403, content={"error": True, "message": "Not logged into the system, access denied."})
 
 
 #用戶註冊
@@ -85,7 +85,7 @@ async def registerUser(user:UserSignup):
 		if existing_user:    
 				return JSONResponse(
 					status_code=400, 
-					content={"error":True, "message":"Email已註冊"}
+					content={"error":True, "message":"Email is registerd."}
 					)
 		
 		else:
