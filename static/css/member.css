@@ -1,0 +1,332 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
+:root {
+    --primary-color: #333; 
+    --secondary: #333; 
+    --text-color: #333;
+    --background-color: #f8f8f8;
+    --container-bg: #fff; 
+    --inputBorderColor: lightgray; 
+    --border-radius: 8px; 
+    --shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    --containerWidth: 800px;
+    --font-primary: "Poppins", sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-primary); 
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-primary); 
+    color: var(--text-color); 
+    background-color: var(--background-color); /
+}
+
+
+/* nav bar */
+.nav-bar {
+    background-color: var(--container-bg);
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--inputBorderColor);
+}
+
+.nav-logo-wrap {
+    align-items: center;
+}
+
+.nav-logo {
+    height: 45px;
+    margin-left:20px;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: var(--primary); 
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    font-weight: 500; 
+    display: inline-flex; 
+    align-items: center; /* center vertically */
+    justify-content: center; /* Center horizontally */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+
+.dropbtn:hover {
+    background-color: #f1f1f1; 
+    transform: scale(1.1); /* Scale up the button slightly */
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+    border-radius: 5px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: var(--primary); 
+    padding: 12px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px; 
+}
+
+/* Dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .dropbtn {
+    background-color: #f1f1f1;
+    color: white;
+}
+
+
+/* notification */
+.notification-wrap{
+    display: flex;
+    max-width: var( --containerWidth);
+    margin: 20px auto;
+
+}
+
+.notification {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.personal-info-wrap {
+    display: flex;
+    margin: 20px auto; 
+    background-color: var(--container-bg); 
+    gap: 20px;
+    max-width: var( --containerWidth);
+    position: relative;
+    padding: 20px;
+    border-radius: var(--border-radius); 
+    box-shadow: var(--shadow);
+}
+.personal-name{
+    margin: 10px 0;
+}
+
+.personal-image-wrap {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    background-color: var(--primary-color); 
+    font-size: 1.5rem;
+    border-radius: 50%; 
+    flex-basis: 60px;
+    padding: 15px 0;
+    color: #fff; 
+}
+
+.personal-data, .personal-number {
+    display: flex;
+    gap: 20px;
+    margin: 8px 0;
+}
+
+/* Titles for saved routes*/
+.save-title, .record-title {
+    margin: 20px auto;
+    text-align: center;
+    font-size: 1.2rem; 
+    font-weight: 600; 
+}
+
+.todo-card-wrap {
+    display: flex;
+    position: relative;
+    margin: 20px auto;
+    align-items: center;
+    justify-content: center;
+    max-width: var( --containerWidth);
+    flex-direction: column;
+}
+
+.card-wrap {
+    background-color: var(--container-bg); 
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius); 
+    display: flex;
+    padding: 10px 20px;
+    gap: 20px;
+    margin: 10px;
+    width: 100%;
+    align-items: center;
+}
+
+.card-grade {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    color: white;
+    background-color: black;
+    font-size: 2rem;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    /* border-radius: 200px;  */
+}
+
+.card-name {
+    flex-grow: 1;
+}
+
+.card-detail {
+    display: flex;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+
+/* styling to-do list buttons */
+.card-btn-wrap {
+    display: flex;
+    gap: 15px;
+    margin-left: auto; 
+}
+
+.card-btn-wrap button {
+    background-color: var(--primary-color); 
+    color: #fff; 
+    border: none; 
+    padding: 10px 20px; 
+    font-size: 16px;
+    border-radius: var(--border-radius); 
+    cursor: pointer; 
+    transition: background-color 0.3s ease, transform 0.3s ease; 
+}
+
+
+.card-btn-wrap button:hover {
+    background-color: #555; 
+    transform: scale(1.05);
+}
+
+
+
+
+ /* delete button*/
+.card-btn-wrap button:last-child {
+    background-color: transparent; 
+    position: relative; 
+    transition: background-color 0.3s ease; 
+}
+
+.card-btn-wrap button:last-child img {
+    filter: invert(1); /* Initially invert color to make the cross white */
+    width: 24px;
+    height: 24px;
+    transition: filter 0.3s ease; 
+}
+
+
+.card-btn-wrap button:last-child:hover img {
+    filter: invert(0); 
+}
+
+
+
+
+/* The Charts */
+.wrapper {
+    /* width: 100%; */
+    max-width: var( --containerWidth);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+.chart-wrap {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+}
+
+.month-chart-wrap, .three-month-chart-wrap {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+@media (max-width: 850px) {
+    .personal-info-wrap, .save-title, .all-cards-wrap, .record-title, .wrapper{
+        margin-left:10px;
+        margin-right:10px
+    }
+}
+
+@media (max-width: 600px) {
+    .card-wrap{
+        gap:10px;
+        padding:10px;
+    }
+    .card-btn-wrap button{
+        padding:10px
+    } 
+    .card-btn-wrap{
+        gap:8px;
+    }
+    .card-grade{
+        font-size: 1rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+    }
+    .card-btn-wrap button:last-child img {
+        width:12px;
+        height:12px;
+    }
+    
+}

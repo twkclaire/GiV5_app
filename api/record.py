@@ -2,23 +2,22 @@ from fastapi import *
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from database import cnxpool
-from enum import Enum
 from typing import Optional
 from datetime import date
 from mysql.connector import Error
-
+from api.auth import decodeJWT
 
 router=APIRouter()
 
 
-
+class DeleteRoute(BaseModel):
+	memberId:int
+	routeId:int
+      
 class RouteSave(BaseModel):
 	memberId:int
 	routeId:int
 
-# class TypeEnum (str, Enum):
-# 	flash ='flash'
-# 	done ='done'
 
 class DoneRoute(BaseModel):
 	memberId:int
@@ -27,14 +26,17 @@ class DoneRoute(BaseModel):
 	completed_date:Optional[date]=None
 
 @router.post("/api/save", tags=["Record"])
-async def saveRoute(route:RouteSave):
+async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
+	if isinstance(token,JSONResponse):
+		return token
+      
 	try: 
 		db =cnxpool.get_connection()
 		mycursor = db.cursor()
 		sql_check="""
 		SELECT * FROM savedRoute WHERE memberId=%s AND routeId=%s 
 		"""
-		val_check=(route.memberId, route.routeId)
+		val_check=(token["id"], route.routeId)
 		mycursor.execute(sql_check,val_check)
 		result=mycursor.fetchone()
 		if result is None:
@@ -42,7 +44,7 @@ async def saveRoute(route:RouteSave):
 			INSERT INTO savedRoute (memberId, routeId)
 			VALUES (%s, %s)
 			"""
-			val=(route.memberId, route.routeId)
+			val=(token["id"], route.routeId)
 			mycursor.execute(sql,val)
 			db.commit()
 			return {"ok":True}
@@ -59,16 +61,53 @@ async def saveRoute(route:RouteSave):
 
 
 
+
+
+
+@router.put("/api/save", tags=["Record"])
+async def deleteSavedRoute(route: DeleteRoute):
+    try:
+        db = cnxpool.get_connection()
+        mycursor = db.cursor()
+        
+        sql_check = """
+        DELETE FROM savedRoute WHERE memberId=%s AND routeId=%s;
+        """
+        val_check = (route.memberId, route.routeId)
+        mycursor.execute(sql_check, val_check)
+        db.commit()
+        
+        #check if delete succesfully 
+        if mycursor.rowcount == 0:
+            return JSONResponse(status_code=404, content={"error": True, "message": "Record not found"})
+
+        return {"ok": True}
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return JSONResponse(status_code=500, content={"error": True, "message": "Internal server error", "details": str(e)})
+    finally:
+        if mycursor:
+            mycursor.close()
+        if db:
+            db.close()
+
+
+
 @router.post("/api/done",tags=["Record"])
-async def routeDone(done:DoneRoute):
-	print("this is what I got from the front:",done)
+async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
+	print("this is what I got from the front:",done)  
+	if isinstance(token,JSONResponse):
+		return token
+      
+        
 	try: 
 		db =cnxpool.get_connection()
 		mycursor = db.cursor()
 		sql_check="""
 		SELECT * FROM achievement WHERE memberId=%s AND routeId=%s 
 		"""
-		val_check=(done.memberId, done.routeId)
+		val_check=(token["id"], done.routeId)
 		mycursor.execute(sql_check,val_check)
 		result=mycursor.fetchone()
 		if result is None:
@@ -76,12 +115,21 @@ async def routeDone(done:DoneRoute):
 			INSERT INTO achievement (memberId, routeId, type)
 			VALUES (%s, %s, %s)
 			"""
-			val=(done.memberId, done.routeId, done.type)
+			val=(token["id"], done.routeId, done.type)
 			mycursor.execute(sql,val)
 			db.commit()
 
 			return {"ok":True}
 		else:
+			sql="""
+			Update achievement 
+            SET type =%s
+            WHERE routeId=%s AND memberId=%s      
+			"""
+			val=(done.type, done.routeId, token["id"])
+			mycursor.execute(sql,val)
+			db.commit()
+                              
 			return{"ok":False}
 	
 	except Exception as e:
@@ -104,7 +152,8 @@ async def getMemberRoute(routeId:int):
 				m.height,
 				m.grade,
 				a.type,
-				a.date
+				a.date,
+                m.memberId  
 			FROM
 				achievement a
 			INNER JOIN
@@ -125,12 +174,14 @@ async def getMemberRoute(routeId:int):
             allMembers = []
             for result in results:
                 data = {
+                      
                     "name": result[0],
                     "gender": result[1],
                     "height": result[2],
                     "grade": result[3],
                     "type": result[4],
-                    "date": result[5]
+                    "date": result[5],
+                    "memberId":result[6]
                 }
                 allMembers.append(data)  # This should be inside the for loop
 
@@ -160,8 +211,13 @@ async def get_video(routeId:int):
             db =cnxpool.get_connection()
             mycursor = db.cursor(dictionary=True)  # Use dictionary=True to get results as dictionaries
             sql = """
-            SELECT * FROM video WHERE route_id=%s
+            SELECT * 
+			FROM video 
+			WHERE route_id = %s 
+				AND mpd_url != 'waiting'
+            ORDER BY video_id DESC;             
             """ 
+            #'waiting' to make sure in case video transcoding failed, this record won't show. 
             val = (routeId,)
             mycursor.execute(sql, val)
             videos = mycursor.fetchall()

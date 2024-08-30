@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multistep form</title>
-  <link rel="stylesheet" href="/static/register.css">
+  <title>Sign In form</title>
+  <link rel="stylesheet" href="/static/css/register.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <body>
         <div class="container">
@@ -19,11 +19,11 @@
                         <!-- <div class="title">Personal Details:</div> -->
                         <div class="field">
                             <div class="label">Email</div>
-                            <input id="email" type="text" required />
+                            <input id="email" type="email" required />
                         </div>
                         <div class="field">
                             <div  class="label">Password</div>
-                            <input id="password" type="text" required />
+                            <input id="password" type="password" required />
                         </div>
                         <div class="field btns">
                             <button class="submit">Submit</button>
@@ -35,47 +35,7 @@
                 </form>
             </div>
         </div>
-        <script>
-        const submitBtn = document.querySelector(".submit");
-        
-        submitBtn.addEventListener("click", function(event) {
-            event.preventDefault();
-          
-            var emailSign = document.getElementById("email").value;
-            var passwordSign = document.getElementById("password").value;
-
-          
-            const authUrl = "/api/user/auth";
-            fetch(authUrl, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: emailSign,
-                password: passwordSign,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.token) {
-                  let JWTtoken = data.token;
-                  console.log(JWTtoken);
-                  localStorage.setItem("token", JWTtoken);
-                  console.log("登入成功！！")
-                //   signInResult.innerText = "登入成功！！";
-                //   window.location.reload();
-                } else {
-                  console.log(data.message);
-                //   signInResult.innerText=data.message;
-          
-                }
-              })
-              .catch((err) => {
-                console.error("Error:", err);
-              });
-          })
-
+        <script src="/static/js/signin.js">
         </script>
     </body>
 </html>

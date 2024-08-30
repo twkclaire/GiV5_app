@@ -1,0 +1,203 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif; 
+}
+
+:root {
+    --primary: #333; 
+    --secondary:rgba(193, 28, 132, 1); 
+    --inputBorderColor: lightgray; 
+    --containerWidth: 800px; 
+}
+/* nav bar */
+.nav-bar {
+    /* background-color: var(--bgColor);  */
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--inputBorderColor);
+}
+
+.nav-logo-wrap {
+    align-items: center;
+}
+
+.nav-logo {
+    height: 45px;
+    margin-left:20px;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: var(--primary); 
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    font-weight: 500; 
+    display: inline-flex; 
+    align-items: center; /* center vertically */
+    justify-content: center; /* Center horizontally */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+
+.dropbtn:hover {
+    background-color: #f1f1f1; 
+    transform: scale(1.1); /* Scale up the button slightly */
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+    border-radius: 5px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: var(--primary); 
+    padding: 12px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px; 
+}
+
+/* Dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .dropbtn {
+    background-color: #f1f1f1;
+    color: white;
+}
+
+/* chart */
+
+.chart-title {
+    margin: 40px auto;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-color);
+    padding-bottom: 10px;
+    position: relative;
+}
+
+
+.chart-wrap {
+    margin: 50px auto;
+    max-width: var(--containerWidth);
+    max-height: 420px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ensure the canvas takes full width of its container */
+#myChart {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 420px;
+}
+
+canvas {
+    display: block;
+}
+
+/* search bar */
+.search-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 40px auto;
+    max-width: var(--containerWidth);
+    width: 100%;
+}
+
+.route-search {
+    border-radius: 5px 0 0 5px;
+    width: 100%;
+    border: 1px solid var(--inputBorderColor);
+    padding: 12px 15px;
+    font-size: 16px;
+}
+
+.route-submit-btn {
+    border-radius: 0 5px 5px 0;
+    border: 1px solid var(--inputBorderColor);
+    background-color: var(--primary);
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* cards */
+.route-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.cards-wrap {
+    max-width: var(--containerWidth);
+    margin: 20px auto;
+}
+
+.card-wrap {
+    background-color: #fff;
+    border: 1px solid var(--inputBorderColor);
+    border-radius: 16px;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    margin: 24px auto;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* shadow */
+}
+
+.card-grade {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    background-color: var(--primary);
+    color: white;
+    font-size: 1.5rem;
+    border-radius: 200px;
+    flex-basis: 60px;
+    padding: 16px 0;
+}
+
+.card-detail {
+    display: flex;
+    margin-top:10px;
+    gap: 10px;
+}
+
+@media (max-width: 850px) {
+    .chart-wrap, .search-wrap, .cards-wrap{
+        margin-left:10px;
+        margin-right:10px
+    }
+    .route-submit-btn{
+        margin-right:20px;
+    }
+}

@@ -4,3 +4,6 @@ myenv/
 *.log
 *.py[cod]
 .dockerignore
+templates/test_admin.html
+templates/test.html
+.DS_Store

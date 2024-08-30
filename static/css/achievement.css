@@ -1,0 +1,237 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
+:root {
+    --primary: #333;
+    --secondary: rgba(193, 28, 132, 1);
+    --text-color: #333;
+    --container-bg: #fff;
+    --inputBorderColor: lightgray;
+    --border-radius: 8px;
+    --shadow: 0 4px 8px rgba(0,0,0,0.1);   
+    --containerWidth: 800px; 
+    --font-primary: "Poppins", sans-serif; 
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-primary);
+}
+.nav-bar {
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--inputBorderColor);
+}
+
+.nav-logo-wrap {
+    align-items: center;
+}
+
+.nav-logo {
+    height: 45px;
+    margin-left:20px;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: var(--primary); 
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    font-weight: 500; 
+    display: inline-flex; 
+    align-items: center; /* center vertically */
+    justify-content: center; /* Center horizontally */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+
+.dropbtn:hover {
+    background-color: #f1f1f1; 
+    transform: scale(1.1); /* Scale up the button slightly */
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+    border-radius: 5px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: var(--primary); 
+    padding: 12px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px; 
+}
+
+/* Dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .dropbtn {
+    background-color: #f1f1f1;
+    color: white;
+}
+
+
+/* Title for Achievements Section */
+.achievements-title {
+    margin: 40px auto;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-color);
+    padding-bottom: 10px;
+    position: relative;
+}
+
+.no-record{
+    position: relative;
+    text-align: center;
+}
+
+.achievements-title::after {
+    content: none; /* Remove the underline effect */
+}
+
+
+.achievements-wrap {
+    max-width: var( --containerWidth);
+    margin: 0 auto;
+    padding: 20px;
+}
+
+
+.achievement-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 20px;
+    /* transition: transform 0.3s ease, box-shadow 0.3s ease; */
+    position: relative;
+    overflow: hidden;
+    transition: opacity 0.5s ease;
+}
+
+
+.achievement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+
+.achievement-grade {
+    background: var(--primary); 
+    color: #fff;
+    font-size: 2rem;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    margin: auto 10px;
+}
+
+
+.achievement-info {
+    display:flex; 
+    flex-direction: column;
+    flex: 1;
+    margin-left: 20px;
+    color: var(--text-color);
+}
+
+.achievement-details{
+    display: flex;
+    gap:10px;
+    margin-top:10px
+}
+.route-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.route-name:hover {
+    color: var(--primary);
+}
+
+.achieve-date {
+    font-size: 16px;
+    color: #888;
+}
+
+
+
+.achievement-btn-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.undo-btn {
+    background-color: var(--secondary); 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: var(--shadow);
+}
+
+.undo-btn:hover {
+    background-color: rgba(193, 28, 132, 0.8); 
+}
+
+.undo-btn:active {
+    background-color: rgba(193, 28, 132, 0.6);
+    transform: scale(0.95);
+}
+
+
+@media (max-width: 480px) {
+    .achievement-card{
+        padding:10px
+    }
+
+    .achievement-grade{
+        width:40px;
+        height:40px;
+        font-size:1rem;
+    }
+    .undo-btn{
+        padding:12px;
+        font-size:0.8rem
+    }
+    
+}

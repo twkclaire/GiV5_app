@@ -3,12 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/member.css">
+    <link rel="stylesheet" href="/static/css/member.css">
+    <link rel="stylesheet" href="/static/css/popupbox.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <title>Document</title>
+    <title>Member Page</title>
 </head>
 <body>
+    <div id="myPopup" class="popup">
+        <div class="popup-content">
+                <div class="popup-title">
+                    <h1 class="guide-title">User Guide</h1>
+                </div>
+                <hr class="title-content-sep">
+                <div class="guide-type">
+                    <h2 class="ex-title">Loggin explain</h2>
+                    <div class="log-exp-wrap">
+                        <p class="log-type">Save:</p>
+                        <p class="log-ex">Save a route in your to do list to help you keep track of your projects.</p>
+                    </div>
+                    <div class="log-exp-wrap">
+                        <p class="log-type">Flash:</p>
+                        <p class="log-ex">You finished the route on your first try.</p>
+                    </div>
+                    <div class="log-exp-wrap">
+                        <p class="log-type">Done:</p>
+                        <p class="log-ex">You successfully climbed the route with multiple tries.</p>
+                    </div>
+                </div>
+                <div class="guide-q">
+                    <h2 class="ex-title">Frequently asked questions</h2>
+                    <p class="guide-ask">Q: I saved a route, where do I see it?</p>
+                    <p class="guide-ans">A: Check out my page, where you can find a list of routes you saved.</p>
+    
+                    <p class="guide-ask">Q: Oops I accidentally clicked the flash/done button, can I undo it?</p>
+                    <p class="guide-ans">A: Yes! You can undo this record at your achievements page.</p>
+                </div>
+    
+    
+                <button id="closePopup">
+                    Got it!
+                </button>
+        </div>
+    </div>
+    <div class="nav-bar">
+        <div class="nav-logo-wrap">
+          <a href="/">  
+            <img class="nav-logo" src="/static/images/logo.png" height="60px">
+          </a>
+        </div>
+        <div class="nav-dropdown-wrap">
+            <div class="dropdown">
+                <button class="dropbtn"><img src="/static/images/User.svg"></button>
+                <div class="dropdown-content">
+                  <!-- <a href="#">My Page</a>
+                  <a href="#">Log out</a> -->
+                </div>
+              </div>
+        </div>        
+    </div>  
+    <div class="notification-wrap">
+        <div id="notification" class="notification" style="display:none;"></div>
+    </div>
     <div class="personal-info-wrap">
         <!-- <div class="personal-image-wrap">
             <div class="personal-image">D</div>
@@ -29,7 +84,7 @@
     </div>
 
     <div class="save-title"><h2>Saved Route</h2></div>
-    <div>
+    <div class="all-cards-wrap">
         <div class="todo-card-wrap">
             <!-- <h2 class="saved-route">Saved Route</h2> -->
             <!-- route card -->
@@ -43,103 +98,35 @@
                     </div>  
                 </div>
                  <div class="card-btn-wrap">
-                    <button>Flash</button>
-                    <button>Done</button>
+                    <button id="route-flash-btn">Flash</button>
+                    <button id="route-done-btn">Done</button>
                     <button><img src="/static/images/cross.svg"></button>
                 </div>  
             </div> -->
 
 
         </div>
+
     </div>
     <div class="record-title"><h2>My Record</h2></div>
 
     <div class="wrapper">
-        <canvas id="myChart4" height="300"></canvas>
+        <div class="chart-wrap">
+            <div class="month-chart-wrap">
+                <canvas id="monthChart" height="300"></canvas>
+            </div>
+            <div class="three-month-chart-wrap">
+                <canvas id="threeMonthChart" height="300"></canvas>
+            </div>
+        </div>
     </div>
-    <script src="/static/member.js"></script>
+
+    </div>
+    <script src="/static/js/member.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script>
-        var ctx = document.getElementById("myChart4").getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
-                datasets: [    {
-                    label: 'V1',
-                    backgroundColor: "#0033C7",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
-                },
-                {
-                    label: 'V2',
-                    backgroundColor: "#1D4EDA",
-                    data: [12, 20, 15, 15, 5, 5, 6, 8, 13, 10, 11, 10],
-                },
-                {
-                    label: 'V3',
-                    backgroundColor: "#3968EC",
-                    data: [20, 30, 35, 20, 23, 24, 10, 17, 10, 8, 11, 5],
-                },
-                {
-                    label: 'V4',
-                    backgroundColor: "#5573FF",
-                    data: [12, 25, 25, 26, 28, 12, 19, 12, 14, 10, 11, 12],
-                },
-                {
-                    label: 'V5',
-                    backgroundColor: "#7859FF",
-                    data: [2, 5, 5, 6, 8, 2, 5, 6, 1, 0 , 0, 1],
-                },
-                {
-                    label: 'V6',
-                    backgroundColor: "#9C3FFF",
-                    data: [1, 0, 1, 0, 1, 2, 0, 1, 1, 0 , 0, 0],
-                },
-                {
-                    label: 'V7',
-                    backgroundColor: "#BF25FF",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
-                },
-                {
-                    label: 'V8',
-                    backgroundColor: "#E30BFF",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
-                },
-                {
-                    label: 'V9',
-                    backgroundColor: "#F54CFF",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0],
-                }
-            ],
-            },
-            options: {
-                plugins: {
-                    tooltip: {
-                        displayColors: true,
-                        callbacks: {
-                            mode: 'x',
-                        },
-                    },
-                    legend: {
-                        position: 'bottom',
-                    }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        grid: {
-                            display: false,
-                        }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        type: 'linear',
-                    }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-            }
-        });
+
+
     </script>
 </body>
 </html>
