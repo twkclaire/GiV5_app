@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # Adjust this if you want to deploy from a different branch
+      - main
 
 jobs:
   deploy:
@@ -16,12 +16,22 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: '3.9'  # Ensure this matches your project's Python version
+        python-version: '3.9'
 
     - name: Install SSH key
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add host key to known_hosts
+      run: |
+        echo "|1|FU+PMXGww+rQTA9owjtK0a3NSS0=|WGm80Orv+iROyitv2LZucvrLkNk= ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCyZU5QjbQ8hddejsOu6zN413K2rdg+kiqF7xJePHcl1kID0XD+hWWur7ke4rFdg6F9JM7TQ+MqNdhio3EAOw9uy2O3j0RqaDM+HIZN6hVlHdyycA5KOdqir2hlsNUlmqhD8Ad9Gnhc0wIVHPBbhBnMfsIyLT/TFYpP6ky9VUw40j67ulz1mFwxTm+D6+gWnbu/qukJMrQyOZn7Gz6U3eK0kxYmA+9c3tFHPRPIt/jfiEk14pZ7nHiYmBCHqfjN4e91urYzlKGyIQIdCz2WuVd4up18g9bsRho9syI3RgTo4C7MYmhJ/mD/BPx2fePth21bZ9Y3CW70ffqdJTC7VTsFxo3oyi5kE1DKJb2hDDTrQ9NdUbo2MDec3XtrRzYJad2oaZxQVpFC4QINeLSkAZTl3IKrnS30+fopv0D6YcLQ29maqbdVvJdEHcVj5BAxJqJrYyF23c71wajmd4WUDMP8HOL9IkUkFLYViLQPj3NA6Xk80z0ck+tO5SNE+cIOCDE=" >> ~/.ssh/known_hosts
+        echo "|1|jP0IyoRVmvqe4KVMdHwRl0sw5rQ=|M9CTmj+2eGwf7+PYyWPRDs3NNss= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNVk+NDJZNp1Z8a70P9OrJgLohp2D8mDzGGflVyx7i5D+jPZcHmGczNOycZkqcrX0hUGslXY333nwOBnrbazz4s=" >> ~/.ssh/known_hosts
+        echo "|1|zgj5Jk7IsILrr6ur4lD314VNCmw=|EOSUDNC0RQuOI41NJgD+RxtyCtA= ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMk815y3K5blQIaCZrs/1U07bZi4vN1tNAnWkk6c2T87" >> ~/.ssh/known_hosts
+
+    - name: Test SSH connection
+      run: |
+        ssh -v ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connected successfully"
 
     - name: Copy files to EC2
       run: |
