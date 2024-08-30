@@ -26,9 +26,15 @@ jobs:
     - name: Add host key to known_hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} > ~/.ssh/known_hosts
+        echo "Running ssh-keyscan..."
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} > ~/.ssh/known_hosts 2> ssh-keyscan-error.log
+        if [ $? -ne 0 ]; then
+          echo "ssh-keyscan failed. Error output:"
+          cat ssh-keyscan-error.log
+          exit 1
+        fi
         echo "Known hosts file content:"
-        cat ~/.ssh/known_hosts  # Verify the content of known_hosts
+        cat ~/.ssh/known_hosts
 
 
     - name: Test SSH connection
