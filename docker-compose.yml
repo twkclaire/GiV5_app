@@ -1,0 +1,16 @@
+version: '3.8'  # Specifies the Docker Compose file version
+
+services:
+  fastapi-app:
+    build:
+      context: .  # Specifies the directory containing the Dockerfile
+    ports:
+      - "8000:8000"  # Maps port 8000 on the host to port 8000 on the container
+    environment:
+      - PYTHONUNBUFFERED=1
+    env_file: 
+      - .env   
+    volumes:
+      - .:/app  # Mounts the project directory on the host to /app in the container
+    command: uvicorn main:app --host 0.0.0.0 --port 8000  # Overrides the CMD in the Dockerfile
+
