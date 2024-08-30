@@ -27,7 +27,9 @@ jobs:
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -H ${{ secrets.EC2_HOST }} > ~/.ssh/known_hosts
+        echo "Known hosts file content:"
         cat ~/.ssh/known_hosts  # Verify the content of known_hosts
+
 
     - name: Test SSH connection
       run: |
