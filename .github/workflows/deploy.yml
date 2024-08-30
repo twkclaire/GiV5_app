@@ -26,7 +26,7 @@ jobs:
     - name: Add host key to known_hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} > ~/.ssh/known_hosts
         cat ~/.ssh/known_hosts  # Verify the content of known_hosts
 
     - name: Test SSH connection
