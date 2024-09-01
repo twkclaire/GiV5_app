@@ -1,7 +1,7 @@
 from mysql.connector.pooling import MySQLConnectionPool
 from dotenv import load_dotenv
 import os
-
+from redis import Redis
 
 dbconfig = {
     "host": os.getenv("DB_HOST"),
@@ -11,3 +11,5 @@ dbconfig = {
 }
 # print("Database configuration:", dbconfig)
 cnxpool = MySQLConnectionPool(pool_name="mypool", pool_size=32, **dbconfig)
+
+rd = Redis(host="localhost", port=6379, db=0)
