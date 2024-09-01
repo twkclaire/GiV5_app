@@ -1,10 +1,26 @@
 from fastapi import * 
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-from database import cnxpool
+from database import cnxpool, rd
 from typing import Optional
+import json
+import requests
 
 router=APIRouter()
+
+@router.get("/redis_test")
+def getRoute():
+    cache_key = "redis_test"
+    cache = rd.get(cache_key)
+
+    if cache:
+        print("cache hit")
+        return json.loads(cache)
+    else:
+        print("cache missed")
+        r= requests.get("https://padax.github.io/taipei-day-trip-resources/taipei-attractions-assignment-1")
+        rd.set(cache_key,r.text)
+        return r.json()
 
 
 @router.get("/api/routes", tags=["Route"])
