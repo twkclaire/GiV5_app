@@ -5,8 +5,17 @@ from database import cnxpool, rd
 from typing import Optional
 import json
 import requests
+from datetime import date, datetime
 
 router=APIRouter()
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    """JSON Encoder that converts dates and datetimes to ISO format."""
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
 
 @router.get("/redis_test")
 def getRoute():
@@ -123,41 +132,57 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
 
 @router.get("/api/route/count",tags=["Route"])
 async def countRoutes():
-    try:
-        db =cnxpool.get_connection()
-        mycursor = db.cursor()
-        sql ="SELECT grade, COUNT(*) AS count FROM route WHERE available=1 GROUP BY grade;"
-        mycursor.execute(sql,)
-        routes=mycursor.fetchall()
-        print(routes)
-        result=[]
-        for route in routes:
-            data={
-                "grade":route[0],
-                "count":route[1]
-            }
-            result.append(data)
-        return result
-            
-    except Exception:
-        return JSONResponse(
-			status_code=500,
-			content={
-				"error":True,
-				"message":"Internal Server Error"
-			}
-		)      
-    finally:
-        if db.is_connected():
-            mycursor.close()
-            db.close()    
+    cache_key="route_count"
+    cache = rd.get(cache_key)
+    if cache:
+        print("cache hit")
+        return json.loads(cache)
+    else:
+        try:
+            print("cache miss")
+            db =cnxpool.get_connection()
+            mycursor = db.cursor()
+            sql ="SELECT grade, COUNT(*) AS count FROM route WHERE available=1 GROUP BY grade;"
+            mycursor.execute(sql,)
+            routes=mycursor.fetchall()
+            print(routes)
+            result=[]
+            for route in routes:
+                data={
+                    "grade":route[0],
+                    "count":route[1]
+                }
+                result.append(data)
+            rd.set(cache_key,json.dumps(result))
+            return result
+                
+        except Exception:
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "error":True,
+                    "message":"Internal Server Error"
+                }
+            )      
+        finally:
+            if db.is_connected():
+                mycursor.close()
+                db.close()    
 
 
 
 
 @router.get("/api/route/{routeID}",tags=["Route"])
 async def getRoutes(routeID:int):
+    cache_key =f"route_{routeID}"
+
+    cached_route =rd.get(cache_key)
+    if cached_route:
+        print("cache hit")
+        return json.loads(cached_route)
+    
     try:
+        print("cache missed")
         db =cnxpool.get_connection()
         mycursor = db.cursor()
         # sql ="SELECT * FROM route where routeId=%s"
@@ -188,16 +213,18 @@ async def getRoutes(routeID:int):
             data={
                 "routeID":route[0],
                 "name":route[1],
-                "date":route[2],
+                "date": route[2].isoformat(),
                 "expired":route[3],
                 "grade":route[4],
                 "available":route[5],
                 "flash":route[6],
                 "done":route[7],
             }
+        rd.set(cache_key, json.dumps(data,cls=CustomJSONEncoder), ex=86400)    
         return data
             
-    except Exception:
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
         return JSONResponse(
 			status_code=500,
 			content={
