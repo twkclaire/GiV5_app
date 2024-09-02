@@ -34,12 +34,21 @@ def getRoute():
 
 @router.get("/api/routes", tags=["Route"])
 async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
+    cache_key = f"routes_page_{page}_keyword_{keyword}"
+    cached_data = rd.get(cache_key)
+
+    if cached_data:
+        print("cache hit")
+        return json.loads(cached_data)
+    
+
     if page ==0:
         start=0
     else:
         start =(page -1)* 8 +8
 
     try:
+        print("cache miss")
         db =cnxpool.get_connection()
         mycursor = db.cursor()
 
@@ -69,7 +78,7 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
             mycursor.execute(sql,(start,))
             results=mycursor.fetchall()
             num_results=len(results)
-            print(results)
+            # print(results)
 
         else: 
             # sql ="SELECT * FROM route WHERE name LIKE %s OR routeId =%s LIMIT 9 OFFSET %s" 
@@ -102,7 +111,7 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
             data={
                 "routeID":result[0],
                 "name":result[1],
-                "date":result[2],
+                "date":result[2].isoformat(),
                 "expired":result[3],
                 "grade":result[4],
                 "available":result[5],
@@ -110,11 +119,12 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
             }
             allRoutes.append(data)
         
-        if num_results ==9:
-            nextPage=page+1
-        else:
-            nextPage=None
-        return{"nextPage":nextPage, "data":allRoutes}
+            nextPage = page + 1 if num_results == 9 else None
+        print("this is all routes:", allRoutes)
+        response_data={"nextPage":nextPage, "data":allRoutes}
+        rd.set(cache_key, json.dumps(response_data,cls=CustomJSONEncoder), ex=86400)
+
+        return response_data
 
 
     except Exception as e:
@@ -129,6 +139,7 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
         if db.is_connected():
             mycursor.close()
             db.close()    
+
 
 @router.get("/api/route/count",tags=["Route"])
 async def countRoutes():
