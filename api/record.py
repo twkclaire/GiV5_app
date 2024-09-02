@@ -1,11 +1,13 @@
 from fastapi import *
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-from database import cnxpool
+from database import cnxpool, rd
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
 from mysql.connector import Error
 from api.auth import decodeJWT
+import json
+
 
 router=APIRouter()
 
@@ -25,6 +27,13 @@ class DoneRoute(BaseModel):
 	type: int
 	completed_date:Optional[date]=None
 
+class CustomJSONEncoder(json.JSONEncoder):
+    """JSON Encoder that converts dates and datetimes to ISO format."""
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
+    
 @router.post("/api/save", tags=["Record"])
 async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
 	if isinstance(token,JSONResponse):
@@ -142,7 +151,14 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 
 @router.get("/api/done/{routeId}",tags=["Record"])
 async def getMemberRoute(routeId:int):
+    cache_key=f"done_{routeId}"
+    cached_done = rd.get(cache_key)
+    if cached_done:
+          print("cache hit")
+          json_data=json.loads(cached_done)
+          return {"data":json_data}
     try:
+        print("cache missed")
         db =cnxpool.get_connection()
         mycursor = db.cursor()
         sql ="""
@@ -184,8 +200,9 @@ async def getMemberRoute(routeId:int):
                     "memberId":result[6]
                 }
                 allMembers.append(data)  # This should be inside the for loop
-
-            return {"data": allMembers}
+        
+        rd.set(cache_key, json.dumps(allMembers,cls=CustomJSONEncoder), ex=3600)    
+        return {"data": allMembers}
 
 
 
