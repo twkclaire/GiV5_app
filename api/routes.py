@@ -112,7 +112,8 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
                 r.expired,
                 r.grade,
                 r.available,
-                COALESCE(COUNT(CASE WHEN a.type = 1 THEN 1 END), 0) AS type_1_count
+                COUNT(CASE WHEN a.type = 1 THEN 1 END) AS type_1_count,
+                COUNT(CASE WHEN a.type = 0 THEN 1 END) AS type_0_count 
             FROM 
                 route r
             LEFT JOIN 
@@ -139,7 +140,8 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
                 r.expired,
                 r.grade,
                 r.available,
-                COALESCE(COUNT(CASE WHEN a.type = 1 THEN 1 END), 0) AS type_1_count
+                COUNT(CASE WHEN a.type = 1 THEN 1 END) AS type_1_count,
+                COUNT(CASE WHEN a.type = 0 THEN 1 END) AS type_0_count 
             FROM 
                 route r
             LEFT JOIN 
@@ -164,7 +166,7 @@ async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
                 "expired":result[3],
                 "grade":result[4],
                 "available":result[5],
-                "done":result[6]
+                "done":result[6] + result[7],
             }
             allRoutes.append(data)
         
