@@ -175,15 +175,17 @@ canvas {
 }
 
 .card-grade {
+    background: var(--primary); 
+    color: #fff;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
     display: flex;
     justify-content: center;
-    align-self: center;
-    background-color: var(--primary);
-    color: white;
-    font-size: 1.5rem;
-    border-radius: 200px;
-    flex-basis: 60px;
-    padding: 16px 0;
+    align-items: center;
+    font-weight: 700;
+    margin: auto 10px;
 }
 
 .card-detail {
