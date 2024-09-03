@@ -16,7 +16,7 @@ class CustomJSONEncoder(json.JSONEncoder):
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         return super().default(obj)
-    
+
 @router.get("/redis_test")
 def getRoute():
     cache_key = "redis_test"
@@ -30,6 +30,7 @@ def getRoute():
         r= requests.get("https://padax.github.io/taipei-day-trip-resources/taipei-attractions-assignment-1")
         rd.set(cache_key,r.text)
         return r.json()
+
 
 
 @router.get("/api/route/stats", tags=["Route"])
@@ -77,6 +78,7 @@ def getStats():
             if db.is_connected():
                 mycursor.close()
                 db.close()    
+
 
 
 
