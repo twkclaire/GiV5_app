@@ -32,6 +32,57 @@ def getRoute():
         return r.json()
 
 
+
+@router.get("/api/route/stats", tags=["Route"])
+def getStats():
+
+    # cache_key="route_count"
+    # cache = rd.get(cache_key)
+    # if cache:
+    #     print("cache hit")
+    #     return json.loads(cache)
+    # else:
+        try:
+            # print("cache miss")
+            db =cnxpool.get_connection()
+            mycursor = db.cursor()
+            sql ="""
+                SELECT 
+                    routeId,
+                    COUNT(*) AS record_count
+                FROM achievement
+                WHERE 
+                    YEAR(date) = YEAR(CURRENT_DATE) 
+                    AND MONTH(date) = MONTH(CURRENT_DATE)
+                GROUP BY routeId
+                ORDER BY record_count DESC
+                LIMIT 1;
+
+            """
+            mycursor.execute(sql,)
+            routes=mycursor.fetchone()
+            print(routes)
+
+            # rd.set(cache_key,json.dumps(result))
+            return routes
+                
+        except Exception:
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "error":True,
+                    "message":"Internal Server Error"
+                }
+            )      
+        finally:
+            if db.is_connected():
+                mycursor.close()
+                db.close()    
+
+
+
+
+
 @router.get("/api/routes", tags=["Route"])
 async def getRoutes(page: int= Query(...,gt=-1), keyword: Optional[str] = None):
     cache_key = f"routes_page_{page}_keyword_{keyword}"

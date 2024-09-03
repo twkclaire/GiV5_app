@@ -192,6 +192,75 @@ canvas {
     gap: 10px;
 }
 
+/* 
+.bento-wrap {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px; 
+    max-width: var(--containerWidth);
+    margin: 40px auto;
+}
+
+.bento {
+    background-color: #fff;
+    border: 1px solid var(--inputBorderColor);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+}
+
+.bento > div {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 10px; 
+}
+
+.bento > p {
+    font-size: 1rem;
+    color: var(--secondary);
+} */
+
+
+/* Bento box styling */
+.intro-box-wrap {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px; /* Adjust the gap between boxes as needed */
+    max-width: var(--containerWidth);
+    margin: 40px auto;
+}
+
+.intro {
+    background-color: #fff;
+    border: 1px solid var(--inputBorderColor);
+    border-radius: 16px;
+    padding: 20px;
+    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px; /* Set a fixed width for each box */
+}
+
+.intro > div {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 10px; /* Space between title and content */
+}
+
+.intro > p {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
 @media (max-width: 850px) {
     .chart-wrap, .search-wrap, .cards-wrap{
         margin-left:10px;

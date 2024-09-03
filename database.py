@@ -12,4 +12,6 @@ dbconfig = {
 # print("Database configuration:", dbconfig)
 cnxpool = MySQLConnectionPool(pool_name="mypool", pool_size=32, **dbconfig)
 
+
 rd = Redis(host="redis", port=6379, db=0)
+
