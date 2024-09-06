@@ -127,6 +127,11 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 			val=(token["id"], done.routeId, done.type)
 			mycursor.execute(sql,val)
 			db.commit()
+                  
+			cache_key=f"done_{done.routeId}"
+			rd.delete(cache_key)
+			print("delete done cache")               
+                     
 
 			return {"ok":True}
 		else:
@@ -138,6 +143,10 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 			val=(done.type, done.routeId, token["id"])
 			mycursor.execute(sql,val)
 			db.commit()
+                  
+			# cache_key=f"done_{done.routeId}"
+			# rd.delete(cache_key)
+			# print("delete done cache")
                               
 			return{"ok":False}
 	
@@ -154,11 +163,11 @@ async def getMemberRoute(routeId:int):
     cache_key=f"done_{routeId}"
     cached_done = rd.get(cache_key)
     if cached_done:
-          print("cache hit")
+          print("done list: cache hit")
           json_data=json.loads(cached_done)
           return {"data":json_data}
     try:
-        print("cache missed")
+        print("done list: cache missed")
         db =cnxpool.get_connection()
         mycursor = db.cursor()
         sql ="""
@@ -201,7 +210,7 @@ async def getMemberRoute(routeId:int):
                 }
                 allMembers.append(data)  # This should be inside the for loop
         
-        rd.set(cache_key, json.dumps(allMembers,cls=CustomJSONEncoder), ex=3600)    
+        rd.set(cache_key, json.dumps(allMembers,cls=CustomJSONEncoder), ex=600)    
         return {"data": allMembers}
 
 
