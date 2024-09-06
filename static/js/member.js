@@ -250,8 +250,17 @@ function getMemberData() {
                 const height = data.height;
                 const gender = data.gender;
                 const grade = data.grade;
-                const done = data.done;
-                const flash = data.flash;
+                // Initialize done and flash
+                let done = 0;
+                let flash = 0;
+                
+                // Update done and flash if they exist in the data
+                if (data.data != null) {
+                    done = data.data;
+                }
+                if (data.flash != null) {
+                    flash = data.flash;
+                }
                 
                 const personalInfoHTML = `
                     <div class="personal-image-wrap">
