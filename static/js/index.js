@@ -118,7 +118,7 @@ function createRouteCard(data) {
 
     const cardDetail = document.createElement('div');
     cardDetail.className = 'card-detail';
-    cardDetail.innerHTML = `<p><img src=/static/images/trash.svg>  ${daysLeft} days left </p><p><img src="/static/images/tick.svg">  Done: ${data.done}</p>`;
+    cardDetail.innerHTML = `<p><img src=/static/images/trash.svg>  ${daysLeft} days left </p><p><img src="/static/images/tick.svg">  ${data.done} people finished it </p>`;
 
     cardName.appendChild(cardDetail);
     cardWrap.appendChild(cardGrade);

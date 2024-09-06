@@ -284,6 +284,7 @@ body {
 }
 
 .month-chart-wrap, .three-month-chart-wrap {
+    position: relative;
     flex: 1;
     min-width: 0;
     border: 1px solid #ddd;
@@ -299,6 +300,17 @@ canvas {
     height: 100% !important;
 }
 
+.no-data-message{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100; 
+    color:var(--font-primary); 
+    font-size: 16px; 
+    text-align: center; 
+    width: 100%;
+}
 
 @media (max-width: 850px) {
     .personal-info-wrap, .save-title, .all-cards-wrap, .record-title, .wrapper{
