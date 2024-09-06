@@ -245,6 +245,7 @@ function getMemberData() {
             })
             .then(data => {
                 // Prepare the HTML for personal-info-wrap
+                console.log("member data:",data);
                 const initial = data.username[0];
                 const username = data.username;
                 const height = data.height;
@@ -255,8 +256,8 @@ function getMemberData() {
                 let flash = 0;
                 
                 // Update done and flash if they exist in the data
-                if (data.data != null) {
-                    done = data.data;
+                if (data.done != null) {
+                    done = data.done;
                 }
                 if (data.flash != null) {
                     flash = data.flash;
@@ -321,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log("monthly achievement:",data)
                 const flash = data.data.monthly_achievement.flash;
                 const done = data.data.monthly_achievement.done;
+
                 const noDataMessage = document.querySelector('.no-data-message');
 
                 if(flash == null && done==null){
