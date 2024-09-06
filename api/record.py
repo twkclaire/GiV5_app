@@ -54,7 +54,10 @@ async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
 			val=(token["id"], route.routeId)
 			mycursor.execute(sql,val)
 			db.commit()
+			cache_key = f"saved_routes_{token['id']}"
+			rd.delete(cache_key)      
 			return {"ok":True}
+            
 		else:
 			return{"ok":False}
 	
