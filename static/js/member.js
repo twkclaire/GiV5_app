@@ -95,7 +95,7 @@ function getSavedRoute() {
             })
             .then(data => {
                 let mainHTML = "";
-                if (data.data.length === 0) {
+                if (!data.data) {
                     mainHTML = "<div class='no-data'>You don't have anything saved yet!</div>";
                     todoCardWrap.innerHTML = mainHTML;
                     return;

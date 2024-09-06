@@ -12,9 +12,7 @@ import json
 router=APIRouter()
 
 
-class DeleteRoute(BaseModel):
-	memberId:int
-	routeId:int
+
       
 class RouteSave(BaseModel):
 	memberId:int
@@ -73,33 +71,7 @@ async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
 
 
 
-@router.put("/api/save", tags=["Record"])
-async def deleteSavedRoute(route: DeleteRoute):
-    try:
-        db = cnxpool.get_connection()
-        mycursor = db.cursor()
-        
-        sql_check = """
-        DELETE FROM savedRoute WHERE memberId=%s AND routeId=%s;
-        """
-        val_check = (route.memberId, route.routeId)
-        mycursor.execute(sql_check, val_check)
-        db.commit()
-        
-        #check if delete succesfully 
-        if mycursor.rowcount == 0:
-            return JSONResponse(status_code=404, content={"error": True, "message": "Record not found"})
 
-        return {"ok": True}
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return JSONResponse(status_code=500, content={"error": True, "message": "Internal server error", "details": str(e)})
-    finally:
-        if mycursor:
-            mycursor.close()
-        if db:
-            db.close()
 
 
 
