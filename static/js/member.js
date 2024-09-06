@@ -95,7 +95,7 @@ function getSavedRoute() {
             })
             .then(data => {
                 let mainHTML = "";
-                if (data.data.length === 0) {
+                if (!data.data) {
                     mainHTML = "<div class='no-data'>You don't have anything saved yet!</div>";
                     todoCardWrap.innerHTML = mainHTML;
                     return;
@@ -250,8 +250,17 @@ function getMemberData() {
                 const height = data.height;
                 const gender = data.gender;
                 const grade = data.grade;
-                const done = data.done;
-                const flash = data.flash;
+                // Initialize done and flash
+                let done = 0;
+                let flash = 0;
+                
+                // Update done and flash if they exist in the data
+                if (data.data != null) {
+                    done = data.data;
+                }
+                if (data.flash != null) {
+                    flash = data.flash;
+                }
                 
                 const personalInfoHTML = `
                     <div class="personal-image-wrap">
@@ -309,65 +318,73 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 // Monthly achievement chart
+                console.log("monthly achievement:",data)
                 const flash = data.data.monthly_achievement.flash;
                 const done = data.data.monthly_achievement.done;
+                const noDataMessage = document.querySelector('.no-data-message');
 
-                const ctxMonth = document.getElementById('monthChart').getContext('2d');
-                new Chart(ctxMonth, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Flash', 'Done'],
-                        datasets: [{
-                            data: [flash, done],
-                            backgroundColor: ['rgba(193,28,132, 1)', 'rgba(34,34,34, 1)'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 10,
-                                bottom:20
-                            },
-                            font:{
-                                size:16,
-                                weight:'bold'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return tooltipItem.label + ': ' + tooltipItem.raw;
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                color: '#fff',
-                                display: true,
-                                anchor: 'end',
-                                align: 'top',
-                                formatter: (value) => value,
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Your achievement this month',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
+                if(flash == null && done==null){
+                    noDataMessage.style.display = 'block';
+                }else{
+                    noDataMessage.style.display = 'none';
+                    const ctxMonth = document.getElementById('monthChart').getContext('2d');
+                    new Chart(ctxMonth, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Flash', 'Done'],
+                            datasets: [{
+                                data: [flash, done],
+                                backgroundColor: ['rgba(193,28,132, 1)', 'rgba(34,34,34, 1)'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 10,
+                                    bottom:20
                                 },
-                                color: '#333',
-                                padding: {
-                                    bottom: 10
+                                font:{
+                                    size:16,
+                                    weight:'bold'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            return tooltipItem.label + ': ' + tooltipItem.raw;
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    color: '#fff',
+                                    display: true,
+                                    anchor: 'end',
+                                    align: 'top',
+                                    formatter: (value) => value,
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Your achievement this month',
+                                    font: {
+                                        size: 16,
+                                        weight: 'bold'
+                                    },
+                                    color: '#333',
+                                    padding: {
+                                        bottom: 10
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    })};
+
+                
 
                 // All-time achievement chart
                 const expectedOrder = ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9"];

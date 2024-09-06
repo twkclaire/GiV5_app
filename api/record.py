@@ -12,9 +12,7 @@ import json
 router=APIRouter()
 
 
-class DeleteRoute(BaseModel):
-	memberId:int
-	routeId:int
+
       
 class RouteSave(BaseModel):
 	memberId:int
@@ -56,7 +54,10 @@ async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
 			val=(token["id"], route.routeId)
 			mycursor.execute(sql,val)
 			db.commit()
+			cache_key = f"saved_routes_{token['id']}"
+			rd.delete(cache_key)      
 			return {"ok":True}
+            
 		else:
 			return{"ok":False}
 	
@@ -73,33 +74,7 @@ async def savedRoute(route:RouteSave,token: dict = Depends(decodeJWT)):
 
 
 
-@router.put("/api/save", tags=["Record"])
-async def deleteSavedRoute(route: DeleteRoute):
-    try:
-        db = cnxpool.get_connection()
-        mycursor = db.cursor()
-        
-        sql_check = """
-        DELETE FROM savedRoute WHERE memberId=%s AND routeId=%s;
-        """
-        val_check = (route.memberId, route.routeId)
-        mycursor.execute(sql_check, val_check)
-        db.commit()
-        
-        #check if delete succesfully 
-        if mycursor.rowcount == 0:
-            return JSONResponse(status_code=404, content={"error": True, "message": "Record not found"})
 
-        return {"ok": True}
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return JSONResponse(status_code=500, content={"error": True, "message": "Internal server error", "details": str(e)})
-    finally:
-        if mycursor:
-            mycursor.close()
-        if db:
-            db.close()
 
 
 
@@ -127,6 +102,11 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 			val=(token["id"], done.routeId, done.type)
 			mycursor.execute(sql,val)
 			db.commit()
+                  
+			cache_key=f"done_{done.routeId}"
+			rd.delete(cache_key)
+			print("delete done cache")               
+                     
 
 			return {"ok":True}
 		else:
@@ -138,6 +118,10 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 			val=(done.type, done.routeId, token["id"])
 			mycursor.execute(sql,val)
 			db.commit()
+                  
+			# cache_key=f"done_{done.routeId}"
+			# rd.delete(cache_key)
+			# print("delete done cache")
                               
 			return{"ok":False}
 	
@@ -154,11 +138,11 @@ async def getMemberRoute(routeId:int):
     cache_key=f"done_{routeId}"
     cached_done = rd.get(cache_key)
     if cached_done:
-          print("cache hit")
+          print("done list: cache hit")
           json_data=json.loads(cached_done)
           return {"data":json_data}
     try:
-        print("cache missed")
+        print("done list: cache missed")
         db =cnxpool.get_connection()
         mycursor = db.cursor()
         sql ="""
@@ -201,7 +185,7 @@ async def getMemberRoute(routeId:int):
                 }
                 allMembers.append(data)  # This should be inside the for loop
         
-        rd.set(cache_key, json.dumps(allMembers,cls=CustomJSONEncoder), ex=3600)    
+        rd.set(cache_key, json.dumps(allMembers,cls=CustomJSONEncoder), ex=600)    
         return {"data": allMembers}
 
 
