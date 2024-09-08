@@ -104,8 +104,12 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 			db.commit()
                   
 			cache_key=f"done_{done.routeId}"
+			cache_key_achievement=f"achievement_undo:{token['id']}"      
 			rd.delete(cache_key)
-			print("delete done cache")               
+			rd.delete(cache_key_achievement)
+            
+	
+			print(f"deldete achievement_undo:{token['id']} and done cache")               
                      
 
 			return {"ok":True}
@@ -119,6 +123,8 @@ async def routeDone(done:DoneRoute,token: dict = Depends(decodeJWT)):
 			mycursor.execute(sql,val)
 			db.commit()
                   
+			cache_key_achievement=f"achievement_undo:{token['id']}"
+			rd.delete(cache_key_achievement)      
 			# cache_key=f"done_{done.routeId}"
 			# rd.delete(cache_key)
 			# print("delete done cache")
