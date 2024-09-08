@@ -7,6 +7,8 @@ import httpx
 import logging
 from api.auth import decodeJWT
 from database import rd
+from api.auth import decodeJWT
+from fastapi.responses import JSONResponse
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -37,7 +39,10 @@ class ProcessVideoRequest(BaseModel):
     video_id: int
 
 @router.post("/api/route/presigned-url", tags=["Video"])
-async def forward_presigned_url(request: PresignedUrlRequest):
+async def forward_presigned_url(request: PresignedUrlRequest, token: dict = Depends(decodeJWT)):
+    if isinstance(token, JSONResponse):
+        return token
+    
     data = {
         "file_name": request.file_name,
         "content_type": request.content_type,
