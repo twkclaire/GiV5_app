@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import httpx
 import logging
 from api.auth import decodeJWT
+from database import rd
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -61,6 +62,9 @@ async def forward_process_video(request: ProcessVideoRequest):
     async with httpx.AsyncClient() as client:
         response = await client.post(f"{VIDEO_SERVICE_URL}/api/route/process-video", json=data)
         if response.status_code == 200:
+            cache_key = f"videos_{request.route_id}"
+            rd.delete(cache_key)
+            print("delete video cache")
             return response.json()
         else:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail", "Error"))

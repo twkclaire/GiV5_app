@@ -213,8 +213,18 @@ async def getMemberRoute(routeId:int):
 @router.get("/api/route/{routeId}/video",tags=["Record"])
 async def get_video(routeId:int):
     print(routeId)
+    
+    cache_key = f"videos_{routeId}"
+    
+    cached_videos = rd.get(cache_key)
+    if cached_videos:
+        print("Videos: Cache hit")
+        videos = json.loads(cached_videos)  # Deserialize JSON data
+        return {"videos": videos}
+    
     if routeId:
         try:
+            print("Videos: Cache miss")
             db =cnxpool.get_connection()
             mycursor = db.cursor(dictionary=True)  # Use dictionary=True to get results as dictionaries
             sql = """
@@ -229,6 +239,7 @@ async def get_video(routeId:int):
             mycursor.execute(sql, val)
             videos = mycursor.fetchall()
             
+            rd.set(cache_key, json.dumps(videos, cls=CustomJSONEncoder), ex=3600)
             return {"videos": videos}              
 
         except Error as e:
