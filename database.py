@@ -13,4 +13,5 @@ dbconfig = {
 cnxpool = MySQLConnectionPool(pool_name="mypool", pool_size=32, **dbconfig)
 
 
-rd = Redis(host="localhost", port=6379, db=0)
+rd = Redis(host="redis", port=6379, db=0)
+

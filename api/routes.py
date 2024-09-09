@@ -16,6 +16,7 @@ class CustomJSONEncoder(json.JSONEncoder):
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         return super().default(obj)
+
     
 # @router.get("/redis_test")
 # def getRoute():
@@ -64,21 +65,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 #             # rd.set(cache_key,json.dumps(result))
 #             return routes
-                
-#         except Exception:
-#             return JSONResponse(
-#                 status_code=500,
-#                 content={
-#                     "error":True,
-#                     "message":"Internal Server Error"
-#                 }
-#             )      
-#         finally:
-#             if db.is_connected():
-#                 mycursor.close()
-#                 db.close()    
-
-
+   
 
 
 @router.get("/api/routes", tags=["Route"])
