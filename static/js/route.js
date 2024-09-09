@@ -174,127 +174,130 @@ document.getElementById("uploadButton").addEventListener("click", function() {
 
 document.getElementById("videoInput").addEventListener("change", async function() {
     const file = this.files[0];
+    const token = localStorage.getItem("token");
+    if (token){
 
-    if (file) {
-        
-        console.log(file.name, file.type, "this is the routeId:", routeId, "the new data:", file.size, "userid:", userId)
-        // Check file size before making a request
-        const MAX_FILE_SIZE_MB = 50;
-        const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
-        
-        if (file.size > MAX_FILE_SIZE_BYTES) {
-            alert(`File size exceeds ${MAX_FILE_SIZE_MB} MB limit.`);
-            return; // Exit early if file is too large
-        }
-        try {
-            document.getElementById("spinner").style.display = "block";
-
-            // Step 1: Request a presigned URL from the backend
-            const response = await fetch("/api/route/presigned-url", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    file_name: file.name,
-                    content_type: file.type,
-                    route_id:routeId,
-                    file_size: file.size,
-                    member_id: userId,
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to get presigned URL. Status: ${response.status}`);
+        if (file) {
+            
+            console.log(file.name, file.type, "this is the routeId:", routeId, "the new data:", file.size, "userid:", userId)
+            // Check file size before making a request
+            const MAX_FILE_SIZE_MB = 50;
+            const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+            
+            if (file.size > MAX_FILE_SIZE_BYTES) {
+                alert(`File size exceeds ${MAX_FILE_SIZE_MB} MB limit.`);
+                return; // Exit early if file is too large
             }
-            const data = await response.json();
-            const presignedUrl = data.presigned_url;
-            const fileKey = data.file_key;
-            const videoId =data.video_id;
+            try {
+                document.getElementById("spinner").style.display = "block";
 
-            // Step 2: Upload the video file to S3 using the presigned URL
-            await fetch(presignedUrl, {
-                method: "PUT",
-                body: file,
-                headers: {
-                    "Content-Type": file.type
+                // Step 1: Request a presigned URL from the backend
+                const response = await fetch("/api/route/presigned-url", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        file_name: file.name,
+                        content_type: file.type,
+                        route_id:routeId,
+                        file_size: file.size,
+                        member_id: userId,
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to get presigned URL. Status: ${response.status}`);
                 }
-            });
+                const data = await response.json();
+                const presignedUrl = data.presigned_url;
+                const fileKey = data.file_key;
+                const videoId =data.video_id;
 
-            if (!response.ok) {
-                throw new Error("Failed to upload file");
+                // Step 2: Upload the video file to S3 using the presigned URL
+                await fetch(presignedUrl, {
+                    method: "PUT",
+                    body: file,
+                    headers: {
+                        "Content-Type": file.type
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to upload file");
+                }
+
+                // Step 3: Notify the backend to start processing the video
+                const processResponse = await fetch("/api/route/process-video", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        route_id: routeId,  
+                        file_key: fileKey,
+                        video_id: videoId
+                    })
+                });
+
+                const processResult = await processResponse.json();
+                console.log("Video processing initiated:", processResult);
+                // displayStatus(processResult);
+
+                displayNotification("Video uploaded. Stay on the page to process the video!");
+                // displayStatus("initiating")
+
+                displayStatus("checking")
+
+                // alert("Video uploaded and processing started successfully!");
+
+                // Step 4: Polling to check video process status 
+                const statusCheckInterval = setInterval(async () => {
+                    if (!videoId){
+                        console.error("videoId is not defined");
+                        return; // Exit if videoId is not valid                
+                    }
+
+                    
+                    try {
+                        const statusResponse = await fetch(`/api/route/video-status/${videoId}`);
+                        if (!statusResponse.ok) {
+                            throw new Error("Failed to get video status");
+                        }
+                        const statusData = await statusResponse.json();
+                        console.log("Status Data:", statusData);
+                        displayStatus(statusData.status)
+
+                        if (statusData.status === "completed") {
+                            clearInterval(statusCheckInterval);
+                            console.log(`Video processing completed! You can watch it here: ${statusData.mpd_url}`)
+                            // alert(`Video processing completed! You can watch it here: ${statusData.mpd_url}`);
+                            displayNotification("Video process completed! Refreshing the page...");
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 5000); // Refreshes the page after 5 seconds
+                        }else if(statusData.status === "failed"){
+                            clearInterval(statusCheckInterval);
+                            alert("Video processing failed!");
+
+                        }
+                    } catch (error) {
+                        console.error("Status check failed:", error);
+                        clearInterval(statusCheckInterval); // Ensure interval is cleared on error
+                        alert("An error occurred while checking video status.");
+                    }
+                }, 10000); // Check every 10 seconds
+
+
+            } catch (error) {
+                console.error("Upload or processing failed:", error);
+                alert("Video upload or processing failed!");
+            } finally {
+                document.getElementById("spinner").style.display = "none";
             }
-
-            // Step 3: Notify the backend to start processing the video
-            const processResponse = await fetch("/api/route/process-video", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    route_id: routeId,  
-                    file_key: fileKey,
-                    video_id: videoId
-                })
-            });
-
-            const processResult = await processResponse.json();
-            console.log("Video processing initiated:", processResult);
-            // displayStatus(processResult);
-
-            displayNotification("Video uploaded. Stay on the page to process the video!");
-            // displayStatus("initiating")
-
-            displayStatus("checking")
-
-            // alert("Video uploaded and processing started successfully!");
-
-            // Step 4: Polling to check video process status 
-            const statusCheckInterval = setInterval(async () => {
-                if (!videoId){
-                    console.error("videoId is not defined");
-                    return; // Exit if videoId is not valid                
-                }
-
-                
-                try {
-                    const statusResponse = await fetch(`/api/route/video-status/${videoId}`);
-                    if (!statusResponse.ok) {
-                        throw new Error("Failed to get video status");
-                    }
-                    const statusData = await statusResponse.json();
-                    console.log("Status Data:", statusData);
-                    displayStatus(statusData.status)
-
-                    if (statusData.status === "completed") {
-                        clearInterval(statusCheckInterval);
-                        console.log(`Video processing completed! You can watch it here: ${statusData.mpd_url}`)
-                        // alert(`Video processing completed! You can watch it here: ${statusData.mpd_url}`);
-                        displayNotification("Video process completed! Refreshing the page...");
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 5000); // Refreshes the page after 5 seconds
-                    }else if(statusData.status === "failed"){
-                        clearInterval(statusCheckInterval);
-                        alert("Video processing failed!");
-
-                    }
-                } catch (error) {
-                    console.error("Status check failed:", error);
-                    clearInterval(statusCheckInterval); // Ensure interval is cleared on error
-                    alert("An error occurred while checking video status.");
-                }
-            }, 10000); // Check every 10 seconds
-
-
-        } catch (error) {
-            console.error("Upload or processing failed:", error);
-            alert("Video upload or processing failed!");
-        } finally {
-            document.getElementById("spinner").style.display = "none";
         }
-    }
-});
+    }});
 
 
 
