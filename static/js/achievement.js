@@ -94,6 +94,7 @@ async function fetchAchievements() {
             console.error(data.message);
             return;
         }
+        console.log("check this:",data)
         console.log("this is username:",  data.name['username'])
         renderAchievements(data.data, data.undo, data.name['username']);
     } catch (error) {

@@ -269,6 +269,22 @@ async def get_member_data(memberId: int, token: dict = Depends(decodeJWT)):
 async def get_member_achievement(memberId: int, token:dict = Depends(decodeJWT)):
     if isinstance(token, JSONResponse):
       return token
+    frontend_memberId=token["id"]
+
+    if frontend_memberId == memberId:
+        cache_key=f"achievement_undo:{memberId}"
+        cached_data = rd.get(cache_key)
+        if cached_data:
+            print("cahce hit, member")
+            return json.loads(cached_data)
+    else:
+        cache_key = f"achievement:{memberId}"
+        cached_data = rd.get(cache_key)
+        if cached_data:
+            print("cache hit, not member")
+            return json.loads(cached_data)
+    
+
     
     try:
         db = cnxpool.get_connection()
@@ -299,12 +315,19 @@ async def get_member_achievement(memberId: int, token:dict = Depends(decodeJWT))
         sql="SELECT username FROM member WHERE memberId= %s"
         mycursor.execute(sql,(memberId,))
         name= mycursor.fetchone()
-        frontend_memberId=token["id"]
+        response_data={
+            "data":results,
+            "undo": memberId==frontend_memberId,
+            "name":name
+        }
         if frontend_memberId == memberId:
-            return {"data":results, "undo": True, "name":name}
+            print("cache missed but saved as DONE achievement")
+            rd.setex(cache_key, 600, json.dumps(response_data, cls=CustomJSONEncoder))
+            return response_data
         else:
-            
-            return{"data":results, "undo": False, "name": name}
+            print("cache missed but saved as achievement")
+            rd.setex(cache_key, 600, json.dumps(response_data, cls=CustomJSONEncoder))
+            return response_data
 
     except Exception as e:
         return JSONResponse(
@@ -346,6 +369,10 @@ async def delete_achievement(request: DeleteAchievementRequest, token:dict = Dep
 
         if mycursor.rowcount ==0:
               raise HTTPException(status_code=404, detail="Record not found")
+        
+        cache_key =f"achievement_undo:{memberId}"
+        rd.delete(cache_key)
+        print("achievement delete")
 
         return {"ok":True}
 
