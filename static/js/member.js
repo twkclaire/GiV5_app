@@ -109,7 +109,7 @@ function getSavedRoute() {
                             <div class="card-name">
                                 <p>${route.routeId}. ${route.routeName}</p>
                                 <div class="card-detail">
-                                    <p>${route.expiredDate}</p>
+                                    <p>Expired on: ${route.expiredDate}</p>
                                 </div>  
                             </div>
                             <div class="card-btn-wrap">
